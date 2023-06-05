@@ -37,6 +37,8 @@ Algunas diferencias de con Django son:
 
 --------------------------------------------
 
+## Encendido de Flask
+
 Ademas de la creación de un venv y la instalación de flask vía PIP en el mismo debemos crear unaa variable de entorno para que el comando **flask run** funcione. Eso lo hacemos con: 
 
 En Linux/Mac:
@@ -52,6 +54,8 @@ set FLASK_APP=main.py
 ```
 
 ------------------------------------------
+
+## Modo debugger en Flask
 
 **Flask** tiene un modo debugger que nos va a permitir salvar cambios y que los mismos impacten directamente en nuestra app sin necesidad de apagar y volver a prender el server. Es un similar al flag "--reload" de uvicorn que usamos cuando trabajamos con fastapi
 
@@ -83,6 +87,92 @@ y correr main.py desde la terminal:
 python main.py 
 ```
 
+-----------------------------------------
 
+## Request y Response:
 
+Flask provee varios tipos de variables que no brindan el contexto de nuestra aplicación una de ellas es request.
+Para ello primero debemos de import **request** de Flask.
 
+```python
+from flask import Flask, request
+```
+
+-----------------------------------------
+
+## Ciclos de Request y Response:
+
+Request-Response: es uno de los métodos básicos que usan las computadoras para comunicarse entre sí, en el que la primera computadora envía una solicitud de algunos datos y la segunda responde a la solicitud.
+
+Por lo general, hay una serie de intercambios de este tipo hasta que se envía el mensaje completo.
+
+Por ejemplo: navegar por una página web es un ejemplo de comunicación de request-response.
+
+Request-response se puede ver como una llamada telefónica, en la que se llama a alguien y responde a la llamada; es decir hacemos una petición y recibimos una respuesta.
+
+Vamos a crear una nueva ruta, guardar el IP del usuario en una Cookie y vamos a redirigir al usuario a la ruta de hello
+
+-----------------------------------------
+
+## Templates con Jinja 2:
+
+¿Que son los templates? ¿Como renderizar archivos HTML en nuestra aplicación? 
+
+Un templeate -> archivo de HTML -> renderiza informacion: Estatica o DInamica -> por variables -> luego nos muestra en el navegador
+
+Para renderizar un template/plantilla creada con Jinja2 simplemente hay que hacer uso del método render_template.
+
+A este método debemos pasarle el nombre de nuestra template y las variables necesarias para su renderizado como parámetros clave-valor.
+
+Flask buscará las plantillas en el directorio templates de nuestro proyecto. En el sistema de ficheros, este directorio se debe encontrar en el mismo nivel en el que hayamos definido nuestra aplicación. En nuestro caso, la aplicación se encuentra en el fichero main.py.
+
+Es hora de crear este directorio y añadir las páginas main.html, La estructura de nuestro proyecto quedaría del siguiente modo:
+
+```bash
+Flask-proyect
+|_main.py
+|_ /templeate
+    |__ hello.html
+```
+Ejemplo archivo main.py
+
+```py
+from flask import Flask, request, make_response, redirect, render_template
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    user_ip = request.remote_addr
+    response = make_response(redirect('/hello_world'))
+    response.set_cookie('user_ip', user_ip)
+
+    return response
+
+@app.route('/hello_world')
+def hello_world():
+    #creamos nueva variable de la ip que detectamos en el browser
+    user_ip = request.cookies.get('user_ip')
+
+    return render_template('hello_world.html', user_ip= user_ip)
+# metodo es render_template con jinja2 y la variable es user_ip.
+```
+
+Con los templates podemos, por ejemplo, en lugar de regresar (return) un string del tipo "Hello World..." regresar un archivo .html
+
+--------------------------------------------------
+
+## Estructuras de control y for loops en los templates:
+
+**Iteración**: es la repetición de un segmento de código dentro de un programa de computadora. Puede usarse tanto como un término genérico (como sinónimo de repetición), así como para describir una forma específica de repetición con un estado mutable.
+
+Un ejemplo de iteración sería el siguiente:
+
+```html
+{% for key, segment in segment_details.items() %}
+        <tr>
+                <td>{{ key }}td>
+                <td>{{ segment }}td>
+        tr>
+{% endfor %}  
+```
