@@ -37,7 +37,7 @@ Algunas diferencias de con Django son:
 
 --------------------------------------------
 
-Ademas de la creación de un venv y la instalación de flask vía PIP en el mismo debemos crear unaa variable de entorno para que el comando flask run funcione. Eso lo hacemos con: 
+Ademas de la creación de un venv y la instalación de flask vía PIP en el mismo debemos crear unaa variable de entorno para que el comando **flask run** funcione. Eso lo hacemos con: 
 
 En Linux/Mac:
 
@@ -51,8 +51,37 @@ En Windows:
 set FLASK_APP=main.py
 ```
 
+------------------------------------------
 
+**Flask** tiene un modo debugger que nos va a permitir salvar cambios y que los mismos impacten directamente en nuestra app sin necesidad de apagar y volver a prender el server. Es un similar al flag "--reload" de uvicorn que usamos cuando trabajamos con fastapi
 
+Tenemos dos formas de hacerlo:
+
+1- crear una variable de entorno: 
+
+En Linux/Mac:
+
+```bash
+export FLASK_DEBUG=1
+```
+
+En Windows:
+
+```bash
+set FLASK_DEBUG=1
+```
+
+2- Otra opción para correr el servidor en modo debug es poner estas lineas al final del archivo main.py:
+
+```python
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+y correr main.py desde la terminal:
+
+```bash
+python main.py 
+```
 
 
 
