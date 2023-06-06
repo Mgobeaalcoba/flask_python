@@ -2,7 +2,7 @@ from flask import Flask, request, make_response, redirect, render_template
 
 app = Flask(__name__) # Le paso como nombre el nombre de este archivo.
 
-todos = ["TODO 1", "TODO 2", "TODO 3", "TODO 4"] # Paso "todos" también al template
+todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
 
 @app.route("/")
 def index():
