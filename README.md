@@ -1,4 +1,4 @@
-# Flask: framework de Python para crear servidores web
+# Flask: framework de Python para crear App´s web
 
 ## ¿Como funcionan las aplicaciones web? 
 
@@ -169,10 +169,21 @@ Con los templates podemos, por ejemplo, en lugar de regresar (return) un string 
 Un ejemplo de iteración sería el siguiente:
 
 ```html
-{% for key, segment in segment_details.items() %}
-        <tr>
-                <td>{{ key }}td>
-                <td>{{ segment }}td>
-        tr>
-{% endfor %}  
+<!-- Ciclo for en template HTML -->
+<ul>
+    {% for todo in todos %}
+        <li>{{todo}}</li> 
+    {% endfor %}    
+</ul>
+```
+
+Un ejemplo de condicional sería este:
+
+```html
+<!-- Condicionales en template HTML -->
+{% if user_ip %}
+    <h2>Hello World, tu Ip es {{user_ip}} </h2>
+{% else %}
+    <a href="{{ url_for('index') }}">Ir a inicio</a>
+{% endif %} 
 ```

@@ -1,6 +1,17 @@
+<!-- Condicionales en template HTML -->
 {% if user_ip %}
     <h2>Hello World, tu Ip es {{user_ip}} </h2>
 {% else %}
     <a href="{{ url_for('index') }}">Ir a inicio</a>
 {% endif %}
+<!-- Ciclo for en template HTML -->
+<ul>
+    {% for todo in todos %}
+        <li>{{todo}}</li> 
+    {% endfor %}    
+</ul>
+<!-- Prueba -->
+<h3>Hola</h3>
+
+
 
