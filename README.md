@@ -247,9 +247,9 @@ En este ejemplo nuestra macro se vería de la siguiente manera:
 
 Un ejemplo de uso de macros en Flask:
 
+```html
 {% from "macros.html" import nav_link with context %}
 
-```html
 <html lang="en">
     <head>
     {% block head %}
