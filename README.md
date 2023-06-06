@@ -190,7 +190,44 @@ Un ejemplo de condicional sería este:
 
 --------------------------------------------------------
 
-## Herencia de templates:
+## Herencia de templates y macros:
+
+**Uso de plantillas**
+
+Uso de plantillas(Block)
+Ejemplo de archivo padre:
+
+```html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% block title %} Flask Platzi | {% endblock %}
+        </title>
+    </head>
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
+    </html>
+```
+Ejemplo de archivo hijo(file.html)
+
+```html
+    {% extends './base.html' %}
+    {% block title %}
+        {{super()}}
+        Bienvenido
+    {% endblock %}
+
+    {% block content %}
+        <p>Bloque de contenido del archivo hijo </p>
+    {% endblock %}
+```
+
+**Uso de Macros (funciones en plantillas)**
 
 Macro: son un conjunto de comandos que se invocan con una palabra clave, opcionalmente seguidas de parámetros que se utilizan como código literal. Los Macros son manejados por el compilador y no por el ejecutable compilado.
 
@@ -231,4 +268,70 @@ Un ejemplo de uso de macros en Flask:
 html>
 ```
 Como podemos observar en la primera línea estamos llamando a macros.html que contiene todos nuestros macros, pero queremos uno en específico así que escribimos import nav_link para traer el macro deseado y lo renderizamos de esta manera en nuestro menú {{ nav_link('home', 'Home') }}.
+
+### Mas ejemplos de uso de macros
+
+Para crear componentes(funciones y código) se define un tipo(macro), el nombre de la funcion y los pámetros.
+
+Ejemplo de estructura:
+
+```html
+    {% macro NAME_FUNCTION(PARAM_1, PARAM_2) %}
+        <p>Bloque de contenido<p>
+    {% endmacro %}
+```
+
+Ejemplo de uso:
+
+```html
+    {% macro render_item(todo) %}
+        <li>Descripción: {{todo}} </li>
+    {% endmacro %}
+```
+Se define un archivo home.html
+
+```html
+    {% import 'render_item_list.html' as macros %}
+
+    {% for description in arrDescriptions %}
+        {{ macros.render_item(description) }}
+    {% endfor %}
+```
+
+----------------------------------------------
+
+## Uso de archivos estaticos: Imagenes
+
+La forma de usar archivos estaticos es similar al manejo de templates HTML. Es decir usamos el helper URL_FOR de flask para importar el archivo que necesitamos. 
+
+**Uso de url_for**
+
+La funcion url_for se puede utilizar para consumir archivos estaticos y redirecionar a otras páginas dentro del proyecto.
+
+**Uso archivos estativos**
+
+Se llaman a traves de la funcion url_for, tiene 2 parámetros:
+
+1.- path = 'static’
+2.- filename = [Ruta del archivo]
+
+Ejemplo:
+
+```html
+<link rel="stylesheet" href="{{ url_for(path = 'static', filename = 'css/main.css')}}">
+<img src="{{url_for(path = 'static', filename = 'images/platzi.png')
+```
+
+**Uso de redireccionamiento a paginas**
+
+Se realiza el redirecciónamiento a traves de la funcion url_for, en el primer
+atributo, se explifica el path del archivo(ruta), ejemplo:
+
+```html
+<li><a href="{{url_for(path = 'index')}}">Inicio</a></li>
+```
+
+--------------------------------------------------------
+
+
 
