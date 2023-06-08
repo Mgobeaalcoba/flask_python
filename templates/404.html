@@ -1,0 +1,11 @@
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ super() }}
+    404
+{% endblock title %}
+
+{% block content %}
+    <h1>Lo sentimos. No encontramos lo que buscabas</h1>
+{% endblock %}

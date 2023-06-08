@@ -4,6 +4,14 @@ app = Flask(__name__) # Le paso como nombre el nombre de este archivo.
 
 todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
 
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html', error=error)
+
+@app.errorhandler(500)
+def server_error(error):
+    return render_template('500.html', error=error)
+
 @app.route("/")
 def index():
     user_ip = request.remote_addr
@@ -21,4 +29,8 @@ def hello():
     }
     return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
     # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
+
+@app.route("/test_server_error")
+def test_server_error():
+    raise(Exception('500 error'))
 

@@ -319,7 +319,7 @@ Ejemplo:
 
 ```html
 <link rel="stylesheet" href="{{ url_for(path = 'static', filename = 'css/main.css')}}">
-<img src="{{url_for(path = 'static', filename = 'images/platzi.png')
+<img src="{{url_for(path = 'static', filename = 'images/platzi.png')}}">
 ```
 
 **Uso de redireccionamiento a paginas**
@@ -332,6 +332,88 @@ atributo, se explifica el path del archivo(ruta), ejemplo:
 ```
 
 --------------------------------------------------------
+
+## Manejo de errores para cuando el cliente quiere ir a paths inexistentes
+
+**Configurar paginas de error**
+
+**Status Code HTTP:**
+
+**100**: no son errores sino mensajes informativos. Como usuario nunca los verás, sino que entre bambalinas indica que la petición se ha recibido y se continúa el proceso.
+
+**200**: estos códigos también indican que todo ha ido correctamente. La petición se ha recibido, se ha procesado y se ha devuelto satisfactoriamente. Por tanto, nunca los verás en tu navegador, pues significan que todo ha ido bien.
+
+**300**: están relacionados con redirecciones. Los servidores usan estos códigos para indicar al navegador que la página o recurso que han pedido se ha movido de sitio. Como usuario, no verás estos códigos, aunque gracias a ellos una página te podría redirigir automáticamente a otra.
+
+**400**: corresponden a errores del cliente y con frecuencia sí los verás. Es el caso del conocido **error 404**, que aparece cuando la página que has intentado buscar no existe. Es, por tanto, un error del cliente (la dirección web estaba mal).
+
+**500**: mientras que los códigos de estado 400 implican errores por parte del cliente (es decir, de parte tuya, tu navegador o tu conexión), los errores 500 son errores desde la parte del servidor. Es posible que el servidor tenga algún problema temporal y no hay mucho que puedas hacer salvo probar de nuevo más tarde.
+
+El error 404 es el que vamos a manejar ahora...
+
+Flask maneja estos errores con un decorador llamado **"errorhandler(StatusCode)"**
+
+```python
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html', error=error)
+```
+
+```html
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ super() }}
+    404
+{% endblock title %}
+
+{% block content %}
+    <h1>Lo sentimos. No encontramos lo que buscabas</h1>
+{% endblock %}
+```
+
+Reto: Manejar el error 500 o Internal Server Error con Flask: 
+
+```python
+@app.errorhandler(500)
+def server_error(error):
+    return render_template('500.html', error=error)
+```
+```python
+@app.route("/test_server_error")
+def test_server_error():
+    raise(Exception('500 error'))
+```
+
+```html
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ super() }}
+    500: Internal Server Error
+{% endblock title %}
+
+{% block content %}
+    <h1>Lo sentimos</h1>
+    <p>Ocurrió un error, estamos trabajando en ello</p>
+{% endblock %}
+```
+
+Para poder testear con la path operation de "/test_server_error" vamos a tener que apagar el servidor de flask y configurar el mode debugger en "0" nuevamente. Es decir, apagarlo de la siguiente forma: 
+
+Linux o Mac:
+```bash
+export FLASK_DEBUG=0
+```
+
+Windows:
+```bash
+set FLASK_DEBUG=0
+```
+
+--------------------------------------
 
 
 
