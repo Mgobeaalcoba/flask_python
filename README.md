@@ -426,44 +426,174 @@ Recordemos que es un **framework**:
 Un conjunto estandarizado de conceptos, prácticas y criterios para enfocar un tipo de problemática particular que sirve como referencia, para enfrentar y resolver nuevos problemas de índole similar.
 
 ```bash
-pip install Flask-Bootstrap4
+pip install Bootstrap-Flask==2.0.2
 ```
 
 Importo la clase Bootstrap
 
 ```py
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap5
 ```
 
 Inicializo un objeto de type Bootstrap:
 
 ```py
 # Inicializo una instancia de Bootstrap
-bootstrap = Bootstrap(app)
+bootstrap = Bootstrap5(app)
 ```
 
 Modifico mi base.html dado que Bootstrap ya tiene un base.html propio que vamos a extender: 
 
 ```html
-{% extends 'bootstrap/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block head %}
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>
+                {% block title %}
+                    Flask Example - 
+                {% endblock %}
+            </title>
 
-{% block head %}
-    {{ super() }}
-    <title>
-        {% block title %}
-            Flask Platzi | 
-        {% endblock  %}
-    </title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-{% endblock %}
+            {% block styles %}
+                {{ bootstrap.load_css() }}
+                <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+            {% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            {% block navbar %}
+                {% include "navbar.html" %}
+            {% endblock %}
+            {% block content %}
+            {% endblock %}
 
-{% block body %}
-    {% block navbar %}
-        {% include 'navbar.html' %}
-    {% endblock %}
-    {% block content %}
-    {% endblock %}
+            {% block scripts %}
+                {{ bootstrap.load_js() }}
+            {% endblock %}
+        {% endblock %}
+    </body>
+</html>
+```
+
+Y finalmente altero mi navbar.html así:
+
+```html
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Flask Example</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('hello') }}">
+                            Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/Mgobeaalcoba" target="_blank">
+                            @Mgobeaalcoba
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 {% endblock %}
 ```
+
+---------------------------------------------
+
+## Configuración de Flask
+
+Por default Flask trabaja en **production mode** pero no deberíamos trabajar de este modo cuando estamos armando nuestra web app sino que deberiamos hacerlo en **development mode**. Para que esto ocurra debemos hacerlo de la siguiente forma: 
+
+en Linux/Mac:
+
+```bash
+export FLASK_ENV=development
+echo $FLASK_ENV
+```
+
+en Windows:
+
+```bash
+set FLASK_ENV=development
+```
+
+Al reencender el servidor con flask run vamos a encontrarnos entonces con que se enciende en "development server"
+
+```bash
+flask run
+```
+
+Para proteger los datos del usuario que guardamos en cookies necesitamos encriptar esta información. Y esto con Flask lo podemos hacer mediante el uso de **SESSION**
+
+SESSION: es un intercambio de información interactiva semipermanente, también conocido como diálogo, una conversación o un encuentro, entre dos o más dispositivos de comunicación, o entre un ordenador y usuario.
+
+Para ello en nuestro archivo main.py debemos alterar una key del dict app.config:
+
+```py
+# Armo mí secret key para ocultar los datos sensibles del usuario: 
+app.config["SECRET_KEY"] = 'SUPER SECRETO' # Al pasar a production luego vamos a encriptar este dato que es lo correcto. 
+```
+
+Luego importo session desde flask:
+
+```py
+# Armo mí secret key para ocultar los datos sensibles del usuario: 
+app.config["SECRET_KEY"] = 'SUPER SECRETO' # Al pasar a production luego vamos a encriptar este dato que es lo correcto. 
+```
+
+despues, dejo de guardar el user_ip en una cookie para guardarla dentro mi sesion: 
+
+```py
+@app.route("/")
+def index():
+    user_ip = request.remote_addr
+    response = make_response(redirect("/hello")) # Redirección guardada en variable
+    # response.set_cookie("user_ip", user_ip) # Guardo IP en Cookie.
+    session['user_ip'] = user_ip
+
+    return response # Retornamos una respuesta de flask que en este caso es un redirect
+```
+
+finalmente, en la route "/hello" vamos a recuperar el user_ip de nuestra session en lugar de la cookie como veniamos haciendo:
+
+```py
+@app.route("/hello")
+def hello():
+    # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
+    user_ip = session.get("user_ip")
+    context = {
+        'user_ip': user_ip,
+        'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+    }
+    return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
+    # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
+```
+
+Al ver la cookie en el navegador vamos a encontrar la misma encriptada por lo que ya no es posible acceder a ese dato como antes. 
+
+Entonces ya vimos el uso de dos helpers de flask. request, de donde podiamos por ejemplo obtener las cookies y ahora session que nos permite guardar info de forma segura. Flask cuenta con otros objetos/helpers con distintas utilidades que se pueden ver acá: 
+
+<img src="./images/helpers_flask.PNG">
+
+--------------------------------------------------
+
+## Implementacion de Flask-Bootstrap y Flask-WTF
+
+**Manejo de información que nos brinda el usuario mediante formularios**
+
+Los formularios generan peticiones de tipo "POST". 
 
 
