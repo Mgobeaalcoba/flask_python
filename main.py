@@ -1,6 +1,11 @@
 from flask import Flask, request, make_response, redirect, render_template
+from flask_bootstrap import Bootstrap5
 
+# Inicializo una instancia de Flask
 app = Flask(__name__) # Le paso como nombre el nombre de este archivo.
+
+# Inicializo una instancia de Bootstrap
+bootstrap = Bootstrap5(app)
 
 todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
 

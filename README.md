@@ -415,5 +415,55 @@ set FLASK_DEBUG=0
 
 --------------------------------------
 
+## Flask cuenta con una serie de extensiones que te permiten otras utilidades como mandar mails o dar formato agradable a nuestra paginas
+
+Particularmente vamos a trabajar con **Flask-Bootstrap** que es justamente un framework para dar contexto mas agradable a nuestras Web App´s. 
+
+https://pythonhosted.org/Flask-Bootstrap/
+
+Recordemos que es un **framework**:
+
+Un conjunto estandarizado de conceptos, prácticas y criterios para enfocar un tipo de problemática particular que sirve como referencia, para enfrentar y resolver nuevos problemas de índole similar.
+
+```bash
+pip install Flask-Bootstrap4
+```
+
+Importo la clase Bootstrap
+
+```py
+from flask_bootstrap import Bootstrap
+```
+
+Inicializo un objeto de type Bootstrap:
+
+```py
+# Inicializo una instancia de Bootstrap
+bootstrap = Bootstrap(app)
+```
+
+Modifico mi base.html dado que Bootstrap ya tiene un base.html propio que vamos a extender: 
+
+```html
+{% extends 'bootstrap/base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <title>
+        {% block title %}
+            Flask Platzi | 
+        {% endblock  %}
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% block navbar %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+    {% block content %}
+    {% endblock %}
+{% endblock %}
+```
 
 
