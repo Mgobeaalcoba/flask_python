@@ -2,6 +2,8 @@
 {% extends 'base.html' %}
 <!-- Import de macros para un render mas efectivo -->
 {% import 'macros.html' as macros %}
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
 
 {% block title %}
     {{ super() }}
@@ -15,6 +17,22 @@
     {% else %}
         <a href="{{ url_for('index') }}">Ir a inicio</a>
     {% endif %}
+
+    <!-- Class container viene desde Bootstrap-->
+    <div class="container">
+        <!-- 
+        <form action="{{ url_for('hello') }}" method="POST">
+            {{ login_form.username }}
+            {{ login_form.username.label }}
+            {{ login_form.password }}
+            {{ login_form.password.label }}
+            {{ login_form.submit }}
+            {{ login_form.submit.label }}
+        </form>
+        -->
+        {{ render_form(login_form) }}
+    </div>
+
     <!-- Ciclo for en template HTML -->
     <ul>
         {% for todo in todos %}

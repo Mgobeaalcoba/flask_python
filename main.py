@@ -1,5 +1,8 @@
 from flask import Flask, request, make_response, redirect, render_template, session
 from flask_bootstrap import Bootstrap5
+from flask_wtf import FlaskForm 
+from wtforms.fields import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
 
 # Inicializo una instancia de Flask
 app = Flask(__name__) # Le paso como nombre el nombre de este archivo.
@@ -9,6 +12,15 @@ bootstrap = Bootstrap5(app)
 
 # Armo mí secret key para ocultar los datos sensibles del usuario: 
 app.config["SECRET_KEY"] = 'SUPER SECRETO' # Al pasar a production luego vamos a encriptar este dato que es lo correcto. 
+
+# Class LoginForm que hereda de FlaskForm:
+class LoginForm(FlaskForm):
+    # Los forms tienen campos o field que deben llenarse:
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
+    # Agregamos un validador de datos que también lo tiene WTF
+    # Agregamos un SubmitField como botón de envio:
+    submit = SubmitField("Enviar")
 
 todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
 
@@ -33,9 +45,11 @@ def index():
 def hello():
     # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
     user_ip = session.get("user_ip")
+    login_form = LoginForm()
     context = {
         'user_ip': user_ip,
         'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+        'login_form': login_form,
     }
     return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
     # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 

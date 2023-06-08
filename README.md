@@ -596,4 +596,181 @@ Entonces ya vimos el uso de dos helpers de flask. request, de donde podiamos por
 
 Los formularios generan peticiones de tipo "POST". 
 
+WTF = Wath the forms
+
+1- Instalamos flask-WTF:
+
+```bash
+pip install flask-wtf
+```
+2- Importo FlaskForm:
+
+```py
+from flask_wtf import FlaskForm 
+```
+
+3- Creo una clase que va a extender a FlaskForm, heredandola:
+
+```py
+class LoginForm(FlaskForm):
+    pass
+```
+
+4- Esta clase debe completarse con los fields o campos que debe tener el form. Los mismos se traen de wtforms.fields así:
+
+```py
+from wtforms.fields import StringField, PasswordField
+```
+
+5- Para validar que los campos del form vengan con la info que necesitamos debemos importar wtforms otro elemento mas: 
+
+```py
+from wtforms.validators import DataRequired
+```
+DataRequired solamente valida que el field no venga vacio. Pero hay otros validators que podemos traer como maximo de caracteres, min de caracteres, etc.
+
+Tenemos todos estos validadores en el module de "validators": 
+
+```py
+__all__ = (
+    "DataRequired",
+    "data_required",
+    "Email",
+    "email",
+    "EqualTo",
+    "equal_to",
+    "IPAddress",
+    "ip_address",
+    "InputRequired",
+    "input_required",
+    "Length",
+    "length",
+    "NumberRange",
+    "number_range",
+    "Optional",
+    "optional",
+    "Regexp",
+    "regexp",
+    "URL",
+    "url",
+    "AnyOf",
+    "any_of",
+    "NoneOf",
+    "none_of",
+    "MacAddress",
+    "mac_address",
+    "UUID",
+    "ValidationError",
+    "StopValidation",
+)
+```
+
+6- Estos validadores se pasan dentro de la instanciación del field:
+
+```py
+# Class LoginForm que hereda de FlaskForm:
+class LoginForm(FlaskForm):
+    # Los forms tienen campos o field que deben llenarse:
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
+    # Agregamos un validador de datos que también lo tiene WTF
+```
+
+7- Solo nos falta generar un botón para que el usuario envíe el formulario lo que se hace importando la clase SubmitField
+
+```py
+from flask_wtf import FlaskForm 
+from wtforms.fields import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
+
+# Class LoginForm que hereda de FlaskForm:
+class LoginForm(FlaskForm):
+    # Los forms tienen campos o field que deben llenarse:
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
+    # Agregamos un validador de datos que también lo tiene WTF
+    # Agregamos un SubmitField como botón de envio:
+    submit = SubmitField("Enviar")
+```
+8- Una vez que ya tenemos nuestro form podriamos importarlo dentro de nuestro archivo hello.html para que el usuario pueda enviarnos info. Para eso debemos enviar una instancia de nuestra clase LoginForm en el context del render_template para la path operation de "/hello" así: 
+
+```py
+@app.route("/hello")
+def hello():
+    # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
+    user_ip = session.get("user_ip")
+    login_form = LoginForm()
+    context = {
+        'user_ip': user_ip,
+        'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+        'login_form': login_form,
+    }
+    return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
+    # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
+```
+
+Y luego recibirla en el template HTML hello.html para renderiar el form usando bootstrap4 de esta manera: 
+
+```html
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+<!-- Import de macros para un render mas efectivo -->
+{% import 'macros.html' as macros %}
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
+{% block title %}
+    {{ super() }}
+    Bienvenido
+{% endblock title %}
+
+{% block content %}
+    <!-- Condicionales en template HTML -->
+    {% if user_ip %}
+        <h2>Hello World, tu Ip es {{user_ip}} </h2>
+    {% else %}
+        <a href="{{ url_for('index') }}">Ir a inicio</a>
+    {% endif %}
+
+    <!-- Class container viene desde Bootstrap-->
+    <div class="container">
+        <!-- 
+        <form action="{{ url_for('hello') }}" method="POST">
+            {{ login_form.username }}
+            {{ login_form.username.label }}
+            {{ login_form.password }}
+            {{ login_form.password.label }}
+            {{ login_form.submit }}
+            {{ login_form.submit.label }}
+        </form>
+        -->
+        {{ render_form(login_form) }}
+    </div>
+
+    <!-- Ciclo for en template HTML -->
+    <ul>
+        {% for todo in todos %}
+            {{ macros.render_todo(todo) }}
+        {% endfor %}    
+    </ul>
+    <!-- Prueba -->
+    <h3>Hola</h3>
+{% endblock content %}
+```
+
+Si no quisieramos renderiar el form usando bootstrap (de por si mas que recomendado) entonces podemos hacerlo también de forma tradicional con Jinja com el bloque de codigo que está comentado dentro de la div class= "container"
+
+Ya no tenemos entonces nuestro form armado, pero si enviamos los datos nos aparecera un error dado que no estamos recibiendo los mismos en nuestro servidor
+
+Error al enviar: 
+
+**Method Not Allowed**
+**The method is not allowed for the requested URL.**
+
+-------------------------------------
+
+
+
+
+
 
