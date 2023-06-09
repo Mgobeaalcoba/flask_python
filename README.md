@@ -769,6 +769,20 @@ Error al enviar:
 
 -------------------------------------
 
+## Uso de método POST en Flask-WTF
+
+Flask acepta peticiones GET por defecto y por ende no debemos declararla en nuestras rutas.
+
+Pero cuando necesitamos hacer una petición POST al enviar un formulario debemos declararla de la siguiente manera, como en este ejemplo:
+
+```py
+@app.route('/platzi-post', methods=['GET', 'POST'])
+```
+
+Debemos declararle además de la petición que queremos, GET, ya que le estamos pasando el parámetro methods para que acepte solo y únicamente las peticiones que estamos declarando.
+
+De esta forma, al actualizar el navegador ya podremos hacer la petición POST a nuestra ruta deseada y obtener la respuesta requerida.
+
 
 
 
