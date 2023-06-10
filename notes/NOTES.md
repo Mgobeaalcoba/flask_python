@@ -817,13 +817,47 @@ def hello():
 
 ## Desplegar Flashes (mensajes emergentes) con Flask:
 
-1- Esto es posible gracias a la clase "flash" de Flask. Por lo que primero debemos importarla así
+1- Esto es posible gracias a la función "flash" de Flask. Por lo que primero debemos importarla así
 
 ```py
 from flask import Flask, request, make_response, redirect, render_template, session, url_for, flash
 ```
 
-2- 
+2- Creamos nuestro flash en python de la siguiente manera: 
+
+```py
+# Guardo un flash en memoría que luego debo reenderiarlo en HTML:
+flash('Nombre de usuario registrado con exito!')
+```
+
+3- Renderizamos nuestro/s mensajes en el template de la siguiente forma si estamos trabajando con Bootstrap5:
+
+```html
+            {% block flash %}
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissible">
+                                <button type="button" 
+                                        data-bs-dismiss="alert" 
+                                        class="close">&times;</button>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            {% endblock  %}
+```
+
+Para que funcione la acción de cerrar el flash al presionar la "X" de nuestro button debemos primero importar en nuestro base.html los archivos JavaScript de Bootstrap5. 
+
+Eso se hace con un block script en base.html de así: 
+
+```html
+            {% block scripts %}
+                {{ bootstrap.load_js() }}
+            {% endblock %}
+```
 
 
 

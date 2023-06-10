@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, redirect, render_template, session, url_for
+from flask import Flask, request, make_response, redirect, render_template, session, url_for, flash
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm 
 from wtforms.fields import StringField, PasswordField, SubmitField
@@ -59,6 +59,9 @@ def hello():
     if login_form.validate_on_submit():
         username = login_form.username.data # Todo el username del post para guardarlo en la sesion
         session['username'] = username # Guardo el username en mi sessión para luego usarlo en el "GET"
+
+        # Guardo un flash en memoría que luego debo reenderiarlo en HTML:
+        flash('Nombre de usuario registrado con exito!')
 
         # Redirijo a index en caso de que completen el form:
         return redirect(url_for('index'))
