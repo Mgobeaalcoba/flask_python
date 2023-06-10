@@ -859,6 +859,46 @@ Eso se hace con un block script en base.html de así:
             {% endblock %}
 ```
 
+--------------------------------
+
+## Pruebas basicas con Flask-testing:
+
+La etapa de pruebas se denomina testing y se trata de una investigación exhaustiva, no solo técnica sino también empírica, que busca reunir información objetiva sobre la calidad de un proyecto de software, por ejemplo, una aplicación móvil o un sitio web.
+
+El objetivo del testing no solo es encontrar fallas sino también aumentar la confianza en la calidad del producto, facilitar información para la toma de decisiones y detectar oportunidades de mejora.
+
+1- Instalamos flask-testing (aunque podriamos hacerlo directamente con unit-test de python):
+
+```bash
+pip install flask-testing
+```
+
+2- Creo un comando para que cuando ejecute flask test corra las pruebas que declare. En el file donde cree mi instancia de Flask (app) debo entonces hacer lo siguiente:
+
+```py
+# Creo mi comando para ejecutar las pruebas automatizadas al correr "flask test" en terminal:
+@app.cli.command()
+def test():
+    tests = unittest.TestLoader().discover('tests')
+    unittest.TextTestRunner().run(tests)
+```
+
+Para hacer la función decorada de arriba necesito primero importar unittest
+
+3- Creo una carpeta "tests" en la raiz de mi proyecto donde voy a guardar todas las pruebas automatizadas. 
+
+4- Pruebo el comando flask test en consola. Si no funciona vuelvo a exportar el nombre de mi FLASK_APP:
+
+```bash
+export FLASK_APP=main.py
+```
+
+5- Al correr flask test no ejecutara ninguno dado que no creamos ningun test por el momento.
+
+6- Creamos nuestro primer testeo: 
+
+``````
+
 
 
 

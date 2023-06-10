@@ -3,6 +3,8 @@ from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm 
 from wtforms.fields import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
+import unittest
+
 
 # Inicializo una instancia de Flask
 app = Flask(__name__) # Le paso como nombre el nombre de este archivo.
@@ -21,6 +23,12 @@ class LoginForm(FlaskForm):
     # Agregamos un validador de datos que también lo tiene WTF
     # Agregamos un SubmitField como botón de envio:
     submit = SubmitField("Enviar")
+
+# Creo mi comando para ejecutar las pruebas automatizadas al correr "flask test" en terminal:
+@app.cli.command()
+def test():
+    tests = unittest.TestLoader().discover('tests')
+    unittest.TextTestRunner().run(tests)
 
 todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
 
