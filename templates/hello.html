@@ -12,8 +12,12 @@
 
 {% block content %}
     <!-- Condicionales en template HTML -->
+    {% if username %}
+        <!-- Con "|" puedo aplicar capitalize u otro filtro/metodo a mis variables traidas desde Python -->
+        <h1>Bienvenido {{  username | capitalize }}</h1>
+    {% endif %}
     {% if user_ip %}
-        <h2>Hello World, tu Ip es {{user_ip}} </h2>
+        <h3>Hello World, tu Ip es {{user_ip}} </h3>
     {% else %}
         <a href="{{ url_for('index') }}">Ir a inicio</a>
     {% endif %}

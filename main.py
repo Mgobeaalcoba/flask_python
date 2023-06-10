@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, redirect, render_template, session
+from flask import Flask, request, make_response, redirect, render_template, session, url_for
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm 
 from wtforms.fields import StringField, PasswordField, SubmitField
@@ -41,16 +41,29 @@ def index():
 
     return response # Retornamos una respuesta de flask que en este caso es un redirect
 
-@app.route("/hello")
+@app.route("/hello", methods=['GET', 'POST'])
 def hello():
     # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
     user_ip = session.get("user_ip")
     login_form = LoginForm()
+    username = session.get('username') # Obtengo mi username de mi session. Luego de haberlo enviado vía post
+
     context = {
         'user_ip': user_ip,
+        'username': username,
         'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
         'login_form': login_form,
     }
+
+    # Si mi route acepta request post entonces puedo usar esos datos.
+    if login_form.validate_on_submit():
+        username = login_form.username.data # Todo el username del post para guardarlo en la sesion
+        session['username'] = username # Guardo el username en mi sessión para luego usarlo en el "GET"
+
+        # Redirijo a index en caso de que completen el form:
+        return redirect(url_for('index'))
+    
+    # Este return es para si nos hacen un "GET":
     return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
     # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
 

@@ -783,6 +783,48 @@ Debemos declararle además de la petición que queremos, GET, ya que le estamos 
 
 De esta forma, al actualizar el navegador ya podremos hacer la petición POST a nuestra ruta deseada y obtener la respuesta requerida.
 
+Para usar los datos de la petición POST debemos primero validar con un "if" si el formulario fue submiteado y en caso afirmativo recargar la pagina desde el index así: 
+
+```py
+@app.route("/hello", methods=['GET', 'POST'])
+def hello():
+    # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
+    user_ip = session.get("user_ip")
+    login_form = LoginForm()
+    username = session.get('username') # Obtengo mi username de mi session. Luego de haberlo enviado vía post
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+        'login_form': login_form,
+    }
+
+    # Si mi route acepta request post entonces puedo usar esos datos.
+    if login_form.validate_on_submit():
+        username = login_form.username.data # Todo el username del post para guardarlo en la sesion
+        session['username'] = username # Guardo el username en mi sessión para luego usarlo en el "GET"
+
+        # Redirijo a index en caso de que completen el form:
+        return redirect(url_for('index'))
+    
+    # Este return es para si nos hacen un "GET":
+    return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
+    # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
+```
+
+--------------------------------------------
+
+## Desplegar Flashes (mensajes emergentes) con Flask:
+
+1- Esto es posible gracias a la clase "flash" de Flask. Por lo que primero debemos importarla así
+
+```py
+from flask import Flask, request, make_response, redirect, render_template, session, url_for, flash
+```
+
+2- 
+
 
 
 
