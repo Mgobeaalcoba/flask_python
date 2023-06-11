@@ -42,3 +42,20 @@ class MainTest(TestCase):
 
         # ¿Luego del post me redirige al index mi route "hello"?
         self.assertEqual(response.location, '/')
+
+    # Sexta prube (¿Existe un blueprint "auth" para nuestra app registrado en blueprints)
+    def test_auth_blueprint_exists(self):
+        self.assertIn('auth', self.app.blueprints)
+        # Va a fallar hasta que no registremos nuestro nuevo blueprint en __init__.py de app
+
+    # Septima prueba (¿Al hacer get al blueprint de auth me devuelve de status code 200?)
+    def test_auth_login_get(self):
+        response = self.client.get(url_for('auth.login'))
+
+        self.assert200(response)
+
+    # Octava prueba (¿Realmente se rendereo el template de ./auth/login )
+    def test_auth_login_template(self):
+        self.client.get(url_for('auth.login'))
+
+        self.assertTemplateUsed('login.html')

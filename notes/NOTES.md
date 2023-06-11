@@ -992,6 +992,74 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Enviar")
 ```
 
+----------------------------------
+
+## Uso de Blueprints:
+
+**Blueprints**: son una serie de rutas que podemos integrar en nuestra aplicacion pero en otro directorio
+es decir, me va a permitir modular la aplicación en pequeñas aplicaciones que hagan cosas específicas
+como autenticación o la parte de welcome, o si tenemos un dashboard de tareas por ejemplo también
+crearíamos un blueprint para las tareas específicas y es más fácil de manejar.
+
+Son como **mini apps** dentro de mi app, con todos sus elementos propios y aislados. 
+
+1. Creo un directorio dentro de app para cada blueprint. En este caso primero un directorio para "auth". 
+
+2. Luego dentro del directorio creado voy a armar un __init__.py
+
+```py
+from flask import Blueprint
+
+# Creo el blueprint
+auth = Blueprint('auth', __name__, url_prefix='/auth')
+# El prefijo significa que todas las rutas que comiencen con /auth van a redirigir a este blueprint
+
+# Creo las vistas de este blueprint en un archivo que se llame views.py dentro del modulo
+```
+
+3. Creo un archivo views.py dentro de mi sub modulo "auth" con el siguiente contenido: 
+
+```py
+from flask import render_template
+
+from app.forms import LoginForm
+from . import auth
+
+
+@auth.route('/login')
+def login():
+    context = {
+        'login_form': LoginForm()
+    }
+    return render_template('login.html', **context)
+```
+
+4. Creo el template login.html que voy a renderiar desde mi auth.route: 
+
+```py
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
+{% block title %}
+    {{ super() }}
+    Login
+{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        {{ render_form(login_form) }}
+    </div>
+{% endblock %}
+```
+
+**Blueprints**: Una serie de rutas que vamos a poder integrar en nuestra aplicación pero en otro directorio. Por ejemplo: "login", "welcome" o "dashboard de tareas". 
+
+
+
+
+
 
 
 

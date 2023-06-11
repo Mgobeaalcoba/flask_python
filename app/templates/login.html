@@ -1,0 +1,15 @@
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
+{% block title %}
+    {{ super() }}
+    Login
+{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        {{ render_form(login_form) }}
+    </div>
+{% endblock %}
