@@ -1,28 +1,12 @@
-from flask import Flask, request, make_response, redirect, render_template, session, url_for, flash
-from flask_bootstrap import Bootstrap5
-from flask_wtf import FlaskForm 
-from wtforms.fields import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired
+from flask import request, make_response, redirect, render_template, session, url_for, flash
+
 import unittest
 
+from app import create_app
+from app.forms import LoginForm
 
 # Inicializo una instancia de Flask
-app = Flask(__name__) # Le paso como nombre el nombre de este archivo.
-
-# Inicializo una instancia de Bootstrap
-bootstrap = Bootstrap5(app)
-
-# Armo mí secret key para ocultar los datos sensibles del usuario: 
-app.config["SECRET_KEY"] = 'SUPER SECRETO' # Al pasar a production luego vamos a encriptar este dato que es lo correcto. 
-
-# Class LoginForm que hereda de FlaskForm:
-class LoginForm(FlaskForm):
-    # Los forms tienen campos o field que deben llenarse:
-    username = StringField('Nombre de usuario', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
-    # Agregamos un validador de datos que también lo tiene WTF
-    # Agregamos un SubmitField como botón de envio:
-    submit = SubmitField("Enviar")
+app = create_app() # Le paso como nombre el nombre de este archivo.
 
 # Creo mi comando para ejecutar las pruebas automatizadas al correr "flask test" en terminal:
 @app.cli.command()

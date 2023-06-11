@@ -897,7 +897,100 @@ export FLASK_APP=main.py
 
 6- Creamos nuestro primer testeo: 
 
-``````
+```py
+from flask_testing import TestCase
+from flask import current_app, url_for
+
+from main import app
+
+class MainTest(TestCase):
+    # Sobre escribo metodo de TestCase para crear instancia de la app que vo ya testear:
+    def create_app(self):
+        app.config['TESTING'] = True
+        # Desactivamos el validador de formularios:
+        app.config['WTF_CSRF_ENABLED'] = False
+        return app
+    
+    # Primer prueba (Verifica si hay una instancia de nuestro proyecto activo)
+    def test_app_exists(self):
+        self.assertIsNotNone(current_app)
+
+    # Segunda prueba (Verifica que la app esté en ambiente de testing)
+    def test_app_in_test_mode(self):
+        self.assertTrue(current_app.config['TESTING'])
+
+    # Tercera prueba (Verifica que nuestro index redirija a Hello)
+    def test_index_redirect(self):
+        response = self.client.get(url_for('index'))
+
+        # ¿Es cierto que la response a mi request get redirije a Hello? 
+        self.assertEqual(response.location, '/hello')
+
+    # Cuarta prueba (Probar que hello nos regresa status code 200 al hacer GET)
+    def test_hello_get(self):
+        response = self.client.get(url_for('hello'))
+
+        self.assert200(response)
+
+    # Quinta prueba (Probar que hello funcione bien al hacer un post):
+    def test_hello_post(self):
+        fake_user = {
+            "username":"Mariano Gobea Alcoba",
+            "password": "lalala1234"
+        }
+        response = self.client.post(url_for('hello'), data=fake_user)
+
+        # ¿Luego del post me redirige al index mi route "hello"?
+        self.assertEqual(response.location, '/')
+```
+
+---------------------------------------
+
+## App Factory: Module App en proyectos Python que sirve para crear una instancia de nuestra app. 
+
+1- Se crea un module llamado "app" con un archivo llamado __init__.py
+
+2- Allí se crea una function llamada create_app()
+
+```py
+from flask import Flask
+from flask_bootstrap import Bootstrap5
+
+from .config import Config
+
+def create_app():
+    app = Flask(__name__)
+    bootstrap = Bootstrap5(app)
+
+    app.config.from_object(Config)
+
+    return app
+```
+3- En el mismo modulo vamos a crear una class Config con la cual vamos a setear todos los elementos de configuración de nuestra 
+
+```py
+class Config:
+    SECRET_KEY = 'SUPER SECRET'
+```
+
+4- Muevo static y templates al directorio app para que pueda encontrar los archivos cuando se ejecuta la app.
+
+5- Voy a crear otro archivo llamado forms.py para mover allí mi clase LoginForm que hereda de "FlaskForm":
+
+```py
+from flask_wtf import FlaskForm 
+from wtforms.fields import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
+
+# Class LoginForm que hereda de FlaskForm:
+class LoginForm(FlaskForm):
+    # Los forms tienen campos o field que deben llenarse:
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
+    # Agregamos un validador de datos que también lo tiene WTF
+    # Agregamos un SubmitField como botón de envio:
+    submit = SubmitField("Enviar")
+```
 
 
 
