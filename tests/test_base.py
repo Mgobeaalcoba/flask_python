@@ -59,3 +59,10 @@ class MainTest(TestCase):
         self.client.get(url_for('auth.login'))
 
         self.assertTemplateUsed('login.html')
+
+    # Novena prueba (¿Si ahora hacemos un post sobre hello devuelve un 405?)
+    def test_hello_post(self):
+        response = self.client.post(url_for('hello'))
+
+        self.assertTrue(response.status_code, 405)
+        

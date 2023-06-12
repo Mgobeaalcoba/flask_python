@@ -3,7 +3,6 @@ from flask import request, make_response, redirect, render_template, session, ur
 import unittest
 
 from app import create_app
-from app.forms import LoginForm
 
 # Inicializo una instancia de Flask
 app = create_app() # Le paso como nombre el nombre de este archivo.

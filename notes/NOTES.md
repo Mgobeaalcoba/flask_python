@@ -1060,6 +1060,19 @@ def login():
 
 ## Blueprints II
 
+Excelente tutorial sobre blueprints (planos) en Flask: 
+
+https://www.youtube.com/watch?v=3Yz6QanCSaA
+
+1. Forma de simplificar una aplicacion de Flask
+2. Es la forma de extender y factorizar nuestra aplicación
+3. NO es una aplicación aparte de Flask
+4. Cada blueprints va a tener todos los endpoints que necesite. 
+5. Ejemplo: Una app con un file app.py donde se inicializa la web app y se crea un endpoint de entrada a la app. Luego debemos despues de crear la app asociar los distintos blueprints a nuestra app. Esto se puede hacer en app.py si es que allí inicializamos la app de Flask o en un archivo __init__.py que viva dentro de un module app y se una funcion para inicializar la app y configurarla y luego asignarle los blueprints correspondientes. 
+6. Luego armo mis distintos blueprints. Puedo armar distintos archivos py con sus nombres o puedo armar distintos modulos, por ejemplo "auth" con archivos __init__.py y archivos views.py que sirvan para inicializar los blueprints y establecer sus visualizaciones en distintos endpoints
+
+---------------------------------------
+
 
 
 
