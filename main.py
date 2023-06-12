@@ -33,34 +33,34 @@ def index():
 
     return response # Retornamos una respuesta de flask que en este caso es un redirect
 
-@app.route("/hello", methods=['GET', 'POST'])
+@app.route("/hello", methods=['GET'])
 def hello():
     # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
     user_ip = session.get("user_ip")
-    login_form = LoginForm()
+    # login_form = LoginForm()
     username = session.get('username') # Obtengo mi username de mi session. Luego de haberlo enviado vía post
 
     context = {
         'user_ip': user_ip,
         'username': username,
         'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
-        'login_form': login_form,
+        # 'login_form': login_form,
     }
 
-    # Si mi route acepta request post entonces puedo usar esos datos.
-    if login_form.validate_on_submit():
-        username = login_form.username.data # Todo el username del post para guardarlo en la sesion
-        session['username'] = username # Guardo el username en mi sessión para luego usarlo en el "GET"
+    # # Si mi route acepta request post entonces puedo usar esos datos.
+    # if login_form.validate_on_submit():
+    #     username = login_form.username.data # Todo el username del post para guardarlo en la sesion
+    #     session['username'] = username # Guardo el username en mi sessión para luego usarlo en el "GET"
 
-        # Guardo un flash en memoría que luego debo reenderiarlo en HTML:
-        flash('Nombre de usuario registrado con exito!')
+    #     # Guardo un flash en memoría que luego debo reenderiarlo en HTML:
+    #     flash('Nombre de usuario registrado con exito!')
 
-        # Redirijo a index en caso de que completen el form:
-        return redirect(url_for('index'))
+    #     # Redirijo a index en caso de que completen el form:
+    #     return redirect(url_for('index'))
     
-    # Este return es para si nos hacen un "GET":
+    # # Este return es para si nos hacen un "GET":
     return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.
-    # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
+    # # Los ** son para expandir el diccionario y transformarlo en variables sueltas. 
 
 @app.route("/test_server_error")
 def test_server_error():

@@ -33,14 +33,14 @@ class MainTest(TestCase):
         self.assert200(response)
 
     # Quinta prueba (Probar que hello funcione bien al hacer un post):
-    def test_hello_post(self):
+    def test_login_post(self):
         fake_user = {
             "username":"Mariano Gobea Alcoba",
             "password": "lalala1234"
         }
-        response = self.client.post(url_for('hello'), data=fake_user)
+        response = self.client.post(url_for('auth.login'), data=fake_user)
 
-        # ¿Luego del post me redirige al index mi route "hello"?
+        # ¿Luego del post me redirige al index mi route "auth/login"?
         self.assertEqual(response.location, '/')
 
     # Sexta prube (¿Existe un blueprint "auth" para nuestra app registrado en blueprints)

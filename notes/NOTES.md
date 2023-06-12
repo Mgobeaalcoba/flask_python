@@ -1056,6 +1056,10 @@ def login():
 
 **Blueprints**: Una serie de rutas que vamos a poder integrar en nuestra aplicación pero en otro directorio. Por ejemplo: "login", "welcome" o "dashboard de tareas". 
 
+--------------------------------------
+
+## Blueprints II
+
 
 
 
