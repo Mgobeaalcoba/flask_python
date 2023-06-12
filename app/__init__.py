@@ -16,4 +16,5 @@ def create_app():
     # Registro el blueprint creado para "auth" dentro de mi app. Sino fallará el test donde veo que exista. 
     app.register_blueprint(auth)
 
+
     return app

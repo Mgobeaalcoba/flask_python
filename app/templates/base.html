@@ -7,9 +7,10 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>
                 {% block title %}
-                    Flask Example - 
+                    My Flask App - 
                 {% endblock %}
             </title>
+            <link rel="icon" href="{{ url_for('static', filename='images/my_logo.png') }}" />
 
             {% block styles %}
                 {{ bootstrap.load_css() }}

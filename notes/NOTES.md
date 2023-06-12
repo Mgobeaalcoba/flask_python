@@ -1073,6 +1073,36 @@ https://www.youtube.com/watch?v=3Yz6QanCSaA
 
 ---------------------------------------
 
+## Base de datos y App Engine con Flask
+
+Flask no tiene un ORM o base de datos con la que trabaja por default. Por lo que podemos trabajar con la base de datos que nosotros queramos siempre que hagamos la configuración correcta de la misma. 
+
+- **Bases de Datos SQL**: su composición esta hecha con bases de datos llenas de tablas con filas que contienen campos estructurados. No es muy flexible pero es el más usado. Una de sus desventajas es que mientras más compleja sea la base de datos más procesamiento necesitará.
+Para trabajar con estas bases de datos Flask cuenta con SQLAlchemy como extensión apropiada para tales fines. 
+
+- **Base de Datos NOSQL**: su composición es no estructurada, es abierta y muy flexible a diferentes tipos de datos, no necesita tantos recursos para ejecutarse, no necesitan una tabla fija como las que se encuentran en bases de datos relacionales y es altamente escalable a un bajo costo de hardware. 
+Nosotros vamos a trabajar con una base de datos no relacional llamada Firebase. 
+En este tipo de base de datos las tablas, rows, columns and primary keys de las bases de datos relacionales se la conoce de otra manera: 
+
+- Table = Collection group
+- Row = Document
+- Column = Field
+- Primary key = Document ID
+
+Vamos a armar una estructura con dos Collection group: 
+
+- Users
+- To do´s
+
+Ambos van a tener su propio ID: 
+
+- User ID
+- To do ID
+
+Con ellos luego podemos recontruir que tareas son de cada usuario
+
+
+
 
 
 

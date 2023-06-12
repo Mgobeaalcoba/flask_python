@@ -10,3 +10,9 @@ img {
     margin-right: 4px;
     float: right;
 }
+
+#form_register {
+    padding: 8px;
+    font-family: sans-serif;
+    
+}
