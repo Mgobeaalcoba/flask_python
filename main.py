@@ -40,10 +40,15 @@ def hello():
     # login_form = LoginForm()
     username = session.get('username') # Obtengo mi username de mi session. Luego de haberlo enviado vía post
 
+    todos = []
+
+    for todo in get_todos(username):
+        todos.append(todo.to_dict()['description'])
+
     context = {
         'user_ip': user_ip,
         'username': username,
-        'todos': get_todos(username), # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+        'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
         # 'login_form': login_form,
     }
 

@@ -25,7 +25,7 @@
     <!-- Ciclo for en template HTML -->
     <ul> 
         {% for todo in todos %} 
-            {{ macros.render_todo(todo.to_dict) }} 
+            {{ macros.render_todo(todo) }} 
         {% endfor %}    
     </ul> 
 {% endblock content %}

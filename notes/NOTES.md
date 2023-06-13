@@ -1116,6 +1116,12 @@ Aunque también funciona con:
 gcloud init
 ```
 
+Si usaste el comando gcloud init te va a pedir que elijas un proyecto por defecto. Por ejemplo yo tengo para este trabajo un proyecto en gcloud llamado "mgobea-flask" ahora bien puede ocurrir que con la misma sesión en otro trabajo requieras cambiar el proyecto. Si eso ocurre puedes hacerlo con el siguiente comando: 
+
+```bash
+gcloud config set project PROJECT_ID
+```
+
 Luego debemos armar nuestra colección de usuarios declarando el primer documento o "caso" de usuario y dentro de este primer caso declarar una nueva coleccion en este caso de "todos" para también generar un primer documento o caso. 
 
 Posteriormente para administrar estos documentos desde la consola debemos correr el comando: 
