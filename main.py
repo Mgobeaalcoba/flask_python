@@ -4,7 +4,8 @@ from flask import request, make_response, redirect, render_template, session, ur
 from flask_login import login_required, current_user
 
 from app import create_app
-from app.firestore_service import get_users, get_todos
+from app.firestore_service import get_users, get_todos, post_todo
+from app.forms import TodoForm 
 
 # Inicializo una instancia de Flask
 app = create_app() # Le paso como nombre el nombre de este archivo.
@@ -34,7 +35,7 @@ def index():
 
     return response # Retornamos una respuesta de flask que en este caso es un redirect
 
-@app.route("/hello", methods=['GET'])
+@app.route("/hello", methods=['GET', 'POST'])
 @login_required
 def hello():
     # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
@@ -48,12 +49,21 @@ def hello():
     # for todo in get_todos(username):
     #     todos.append(todo.to_dict()['description'])
 
+    # Instanceo un TodoForm: 
+    todo_form = TodoForm()
+
     context = {
         'user_ip': user_ip,
         'username': username,
         'todos': get_todos(username), # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
-        # 'login_form': login_form,
+        'todo_form': todo_form,
     }
+
+    if todo_form.validate_on_submit():
+        todo = todo_form.description.data
+        post_todo(username, todo)
+
+        return redirect(url_for('index'))
 
     # # Si mi route acepta request post entonces puedo usar esos datos.
     # if login_form.validate_on_submit():

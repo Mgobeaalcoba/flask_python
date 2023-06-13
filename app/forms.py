@@ -20,3 +20,8 @@ class SignupForm(FlaskForm):
     # Agregamos un validador de datos que también lo tiene WTF
     # Agregamos un SubmitField como botón de envio:
     submit = SubmitField("Enviar")
+
+# Class TodoForm que hereda de FlaskForm y se usará para cargar tareas: 
+class TodoForm(FlaskForm):
+    description = StringField('Descripción', validators=[DataRequired()])
+    submit = SubmitField('Crear')

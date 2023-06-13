@@ -36,3 +36,10 @@ def post_user(user_data):
     user_ref.set({
         'password': user_data.password
     })
+
+# Armo una función para insertar en mi database una nueva tarea: 
+def post_todo(user_id, todo):
+    todo_ref = db.collection('users').document(user_id).collection('todos')
+    todo_ref.add({
+        'description': todo
+    })

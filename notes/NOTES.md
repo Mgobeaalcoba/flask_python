@@ -1792,6 +1792,44 @@ Con esto ya estamos registrando desde el form usuarios en nuestra base de datos 
 
 ---------------------------------------
 
+## Agregar tareas o "to do´s" a nuestra base de datos y WebApp
+
+1. Crear una nueva clase de form para ingresar las tareas que queremos cargar: 
+
+```py
+# Class TodoForm que hereda de FlaskForm y se usará para cargar tareas: 
+class TodoForm(FlaskForm):
+    description = StringField('Descripción', validators=[DataRequired()])
+    submit = SubmitField('Crear')
+```
+
+2. A esta forma ahora la vamos a importar y usar en nuestro endpoint de "hello", al cual tambien lo vamos a editar para aceptar peticiones de tipo "POST"
+
+```py
+@app.route("/hello", methods=['GET', 'POST'])
+@login_required
+def hello():
+    user_ip = session.get("user_ip")
+    username = current_user.id
+    
+    todo_form = TodoForm()
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': get_todos(username), 
+        'todo_form': todo_form,
+    }
+
+    if todo_form.validate_on_submit():
+        todo = todo_form.description.data
+        post_todo(username, todo)
+
+        return redirect(url_for('index'))
+
+    return render_template('hello.html', **context) 
+```
+
 
 
 

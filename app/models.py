@@ -24,3 +24,7 @@ class UserModel(UserMixin):
         )
 
         return UserModel(user_data)
+    
+# class Todo():
+#     def __init__(self, description) -> None:
+#         self.description = description

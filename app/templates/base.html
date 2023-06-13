@@ -24,25 +24,28 @@
                 {% include "navbar.html" %}
             {% endblock %}
 
-            <!-- Bloque que renderiza en todas mis URL, por la herencia, los flashes -->
-            {% block flash %}
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-success alert-dismissible">
-                                {{ message }}
-                                <button id="close-button"
-                                        type="button" 
-                                        data-bs-dismiss="alert" 
-                                        class="close">&times;</button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            {% endblock  %}
+            <!-- Armo una div para darle formato y mejor presentación con CSS -->
+            <div id="content-base">
+                <!-- Bloque que renderiza en todas mis URL, por la herencia, los flashes -->
+                {% block flash %}
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-success alert-dismissible">
+                                    {{ message }}
+                                    <button id="close-button"
+                                            type="button" 
+                                            data-bs-dismiss="alert" 
+                                            class="close">&times;</button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                {% endblock  %}
 
-            {% block content %}
-            {% endblock %}
+                {% block content %}
+                {% endblock %}
+            </div>
 
             {% block scripts %}
                 {{ bootstrap.load_js() }}

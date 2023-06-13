@@ -3,7 +3,7 @@
 <!-- Import de macros para un render mas efectivo -->
 <!-- {% import 'macros.html' as macros %} -->
 <!-- Import de bootstrap a wtf para renderiar el form mas facil -->
-<!-- {% from 'bootstrap4/form.html' import render_form %} -->
+{% from 'bootstrap4/form.html' import render_form %}
 
 {% block title %}
     {{ super() }}
@@ -14,10 +14,10 @@
     <!-- Condicionales en template HTML -->
     {% if username %}
         <!-- Con "|" puedo aplicar capitalize u otro filtro/metodo a mis variables traidas desde Python -->
-        <h1>Bienvenido {{  username | capitalize }}</h1>
+        <h1 class="welcome-info">Bienvenido {{  username | capitalize }}</h1>
     {% endif %}
     {% if user_ip %}
-        <h3>Hello World, tu Ip es {{user_ip}} </h3>
+        <h3 class="welcome-info">Te estas conectando desde tu Ip :{{user_ip}} </h3>
     {% else %}
         <a href="{{ url_for('index') }}">Ir a inicio</a>
     {% endif %}
@@ -28,6 +28,12 @@
             {{ macros.render_todo(todo) }} 
         {% endfor %}    
     </ul> 
+
+    <!-- Rendereo mi form para tareas debajo de las que tareas que ya tengo -->
+    <h3 id="title-login" class="titles-form">Ingresa una nueva tarea:</h3>
+    <div id="form-register" class="container">
+        {{ render_form(todo_form) }}
+    </div>
 {% endblock content %}
 
 

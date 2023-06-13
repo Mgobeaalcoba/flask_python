@@ -6,6 +6,10 @@ img {
     max-width: 30px;
 }
 
+#content-base {
+    margin: 12px;
+}
+
 #close-button {
     margin-right: 4px;
     float: right;
@@ -18,5 +22,13 @@ img {
 
 .titles-form {
     margin-left: 76px;
-    margin-top: 16px;
+    margin-top: 32px;
+}
+
+.welcome-info {
+    padding: 8px;
+}
+
+.task-list {
+    padding: 4px;
 }
