@@ -1,8 +1,9 @@
 from flask import render_template, session, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash # Librería de seguridad para hashear passwords
 
-from app.forms import LoginForm
-from app.firestore_service import get_user
+from app.forms import LoginForm, SignupForm
+from app.firestore_service import get_user, get_users, post_user
 from app.models import UserData, UserModel
 from . import auth
 
@@ -29,7 +30,7 @@ def login():
             password_from_db = user_doc.to_dict()['password']
 
             ### Valido que el password del form sea el mismo que el password de la database: 
-            if password == password_from_db:
+            if check_password_hash(password_from_db, password):
                 ### Armo user_data y user_model para enviarlo a flask-login:
                 user_data = UserData(
                     username= username,
@@ -64,5 +65,55 @@ def login():
 def logout():
     logout_user()
     flash('Regresa pronto')
-    
+
     return redirect(url_for('auth.login'))
+
+@auth.route('/signup', methods=['GET', 'POST'])
+def signup():
+    signup_form = SignupForm() # Creo un nuevo Form que repite el password para evitar errores involuntarios 
+    context = {
+        'signup_form': signup_form 
+    }
+
+    if signup_form.validate_on_submit(): 
+        # Recupero la info del form: 
+        username = signup_form.username.data
+        password = signup_form.password.data
+        repeat_password = signup_form.repeat_password.data
+
+        # Primera validación: Si el usuario ya existe en nuestra database: 
+        # users_firebase = get_users()
+        # users = []
+
+        # for user in users_firebase:
+        #     users.append(user.id)
+
+        # if username in users:
+        #     flash('El usuario ya existe en nuestra base de datos')
+
+        # Otra forma de hacer la misma validación que hice arriba con get_users() es:
+        user_doc = get_user(username)
+
+        if user_doc.to_dict() is not None:
+            flash('El usuario ya existe en nuestra base de datos')
+        else:
+            # Segunda validación: Si el password coincide con el repeat_password:
+            if password == repeat_password:
+                password_hash = generate_password_hash(password)
+                user_data = UserData(
+                    username= username,
+                    password= password_hash
+                )
+                # Registro mi usuario en la base de firebase
+                post_user(user_data)
+                # Hago login luego del registro:
+                user = UserModel(user_data)
+                login_user(user)
+                flash('Bienvenido!!!')
+
+                return redirect(url_for('index'))
+
+            else:
+                flash('Los passwords ingresados no son iguales. Reviselos')
+
+    return render_template('signup.html', **context)

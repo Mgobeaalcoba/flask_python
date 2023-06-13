@@ -27,3 +27,12 @@ def get_user(user_id):
 # Armo mi segunda función para esta vez traer mis todos de mi database Firebase: 
 def get_todos(user_id):
     return db.collection('users').document(user_id).collection('todos').get()
+
+# Armo una función para insertar en mi database un nuevo usuario: 
+def post_user(user_data):
+    # Creo mi nuevo documento donde el id es el username
+    user_ref = db.collection('users').document(user_data.username)
+    # Defino el password de este nuevo usuario que es el unico campo de mi document:
+    user_ref.set({
+        'password': user_data.password
+    })

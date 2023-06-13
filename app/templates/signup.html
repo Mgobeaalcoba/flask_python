@@ -5,12 +5,12 @@
 
 {% block title %}
     {{ super() }}
-    Login
+    Signup
 {% endblock title %}
 
 {% block content %}
-    <h3 id="title-login" class="titles-form">Ingresa con tus credenciales:</h3>
-    <div id="form-register" class="container">
-        {{ render_form(login_form) }}
+    <h3 id="title-signup" class="titles-form">Registra una nueva cuenta:</h3>
+    <div id="form_register" class="container">
+        {{ render_form(signup_form) }}
     </div>
 {% endblock %}

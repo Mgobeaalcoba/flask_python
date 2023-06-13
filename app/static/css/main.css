@@ -11,8 +11,12 @@ img {
     float: right;
 }
 
-#form_register {
+#form-register {
     padding: 8px;
     font-family: sans-serif;
-    
+}
+
+.titles-form {
+    margin-left: 76px;
+    margin-top: 16px;
 }

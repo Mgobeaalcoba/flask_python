@@ -10,3 +10,13 @@ class LoginForm(FlaskForm):
     # Agregamos un validador de datos que también lo tiene WTF
     # Agregamos un SubmitField como botón de envio:
     submit = SubmitField("Enviar")
+
+# Class LoginForm que hereda de FlaskForm:
+class SignupForm(FlaskForm):
+    # Los forms tienen campos o field que deben llenarse:
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
+    repeat_password = PasswordField('Repetir password', validators=[DataRequired()])
+    # Agregamos un validador de datos que también lo tiene WTF
+    # Agregamos un SubmitField como botón de envio:
+    submit = SubmitField("Enviar")

@@ -1636,6 +1636,163 @@ Listo! Ya tenemos Login y Logout en nuestra webapp. Ahora vamos a diseñar en un
 
 ## Signup
 
+- Registramos un usuario en la base de datos de firebase. Tambien vamos a preocuparnos por hashear el password antes de guardarlo. Primero encriptamos ese password y luego lo guardamos encriptado. Nadie debe conocer ese password mas que el usuario que lo creo. 
+
+1. Armo una nueva route en mi blueprint de auth para el signup, por el momento le voy a armar la lógica para que funcione con peticiones de tipo GET:  
+
+```py
+@auth.route('/signup', methods=['GET', 'POST'])
+def signup():
+    signup_form = SignupForm() # Creo un nuevo Form que repite el password para evitar errores involuntarios 
+    context = {
+        'signup_form': signup_form 
+    }
+    
+    return render_template('signup.html', **context)
+```
+
+2. Armo el template que va a renderear mi endpoint: 
+
+```html
+<!-- Herencia de templates -->
+{% extends 'base.html' %}
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
+{% block title %}
+    {{ super() }}
+    Signup
+{% endblock title %}
+
+{% block content %}
+    <h3 id="title-signup" class="titles-form">Registra una nueva cuenta:</h3>
+    <div id="form_register" class="container">
+        {{ render_form(signup_form) }}
+    </div>
+{% endblock %}
+```
+
+3. Como habrán visto, cree una nueva clase de forms para usar en signup distinta a la de login, dado que quiero validar que el password sea igual al password repetido para así evitar errores involuntarios. La clase queda así: 
+
+```py
+# Class LoginForm que hereda de FlaskForm:
+class SignupForm(FlaskForm):
+    # Los forms tienen campos o field que deben llenarse:
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()]) # WTF va a manejar pertinentemente estos password. Es decir de forma segura.
+    repeat_password = PasswordField('Repetir password', validators=[DataRequired()])
+    # Agregamos un validador de datos que también lo tiene WTF
+    # Agregamos un SubmitField como botón de envio:
+    submit = SubmitField("Enviar")
+```
+
+4. Ahora vamos a recibir los datos submitiados a traves del form para poder enviarlos posteriormente a nuestra database así: 
+
+- views.py
+
+```py
+@auth.route('/signup', methods=['GET', 'POST'])
+def signup():
+    signup_form = SignupForm() # Creo un nuevo Form que repite el password para evitar errores involuntarios 
+    context = {
+        'signup_form': signup_form 
+    }
+
+    if signup_form.validate_on_submit(): 
+        # Recupero la info del form: 
+        username = signup_form.username.data
+        password = signup_form.password.data
+        repeat_password = signup_form.repeat_password.data
+
+        # Primera validación: Si el usuario ya existe en nuestra database: 
+        user_doc = get_user(username)
+
+        if user_doc.to_dict() is not None:
+            flash('El usuario ya existe en nuestra base de datos')
+        else:
+            # Segunda validación: Si el password coincide con el repeat_password:
+            if password == repeat_password:
+                password_hash = generate_password_hash(password)
+                user_data = UserData(
+                    username= username,
+                    password= password_hash
+                )
+                # Registro mi usuario en la base de firebase
+                post_user(user_data)
+                # Hago login luego del registro:
+                user = UserModel(user_data)
+                login_user(user)
+                flash('Bienvenido!!!')
+
+                return redirect(url_for('index'))
+
+            else:
+                flash('Los passwords ingresados no son iguales. Reviselos')
+
+    return render_template('signup.html', **context)
+```
+
+- firestore_service.py
+
+```py
+# Armo una función para insertar en mi database un nuevo usuario: 
+def post_user(user_data):
+    # Creo mi nuevo documento donde el id es el username
+    user_ref = db.collection('users').document(user_data.username)
+    # Defino el password de este nuevo usuario que es el unico campo de mi document:
+    user_ref.set({
+        'password': user_data.password
+    })
+```
+Como ahora estoy enviando mis password hasheados a la base de datos, para hacer login voy a necesitar "des-hashearlo" lo que voy a hacer modificando "login"
+
+```py
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    login_form = LoginForm()
+    context = {
+        'login_form': login_form
+    }
+
+    if login_form.validate_on_submit():
+
+        username = login_form.username.data 
+        password = login_form.password.data 
+
+        user_doc = get_user(username) 
+
+        if user_doc.to_dict() is not None: 
+            password_from_db = user_doc.to_dict()['password']
+
+            if check_password_hash(password_from_db, password): # des-hasheado del password para compararlos
+
+                user_data = UserData(
+                    username= username,
+                    password= password
+                )
+                user = UserModel(
+                    user_data
+                )
+
+                login_user(user) # Login completado
+
+                flash('Bienvenido de nuevo')
+
+                redirect(url_for('index'))
+            else:
+                flash('La información no coincide con nuestra base de datos')
+        else:
+            flash('El usuario ingresado no existe')
+
+        return redirect(url_for('index'))
+
+    return render_template('login.html', **context)
+```
+Con esto ya estamos registrando desde el form usuarios en nuestra base de datos y también estamos hasdeando los password para guardarlos en nuestra database así como tambien deshasheandolos al momento de validar si ingreso los datos correctamente o no lo hizo. 
+
+---------------------------------------
+
+
 
 
 
