@@ -1,7 +1,7 @@
 import unittest
 
 from flask import request, make_response, redirect, render_template, session, url_for, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from app import create_app
 from app.firestore_service import get_users, get_todos
@@ -40,7 +40,8 @@ def hello():
     # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
     user_ip = session.get("user_ip")
     # login_form = LoginForm()
-    username = session.get('username') # Obtengo mi username de mi session. Luego de haberlo enviado vía post
+    # username = session.get('username') # Obtengo mi username de mi session. Luego de haberlo enviado vía post
+    username = current_user.id
 
     # todos = []
 
@@ -65,7 +66,7 @@ def hello():
     #     # Redirijo a index en caso de que completen el form:
     #     return redirect(url_for('index'))
 
-    users = get_users() # Nos devuelve una lista de usuarios sobre la cual vamos a poder iterar
+    # users = get_users() # Nos devuelve una lista de usuarios sobre la cual vamos a poder iterar
 
     # for user in users:
     #     print(user.id)

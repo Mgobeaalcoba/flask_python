@@ -1488,6 +1488,156 @@ Ahora debemos verificar que el usuario que está ingresando esté en nuestra bas
 
 ------------------------------------------------
 
+## Login propio del usuario y Logout
+
+**Login**
+
+1. Una vez que el usuario nos envía el formulario y nosotros validados que el mismo sea valido. Tenemos que revisar si el mismo existe en la base de datos o no. 
+
+- views.py
+
+Primero debo importar: 
+
+```py
+from flask_login import login_user
+
+from app.firestore_service import get_user
+from app.models import UserData, UserModel
+```
+
+Luego ya puedo armar mi route de la siguiente forma: 
+
+```py
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    login_form = LoginForm()
+    context = {
+        'login_form': login_form
+    }
+
+    if login_form.validate_on_submit():
+        # Validamos si el usuario se encuentra en nuestra base de datos o no: 
+        ## Obtenemos el username que nos envío y su password
+        username = login_form.username.data # Tomo el username del post para guardarlo en la sesion
+        password = login_form.password.data # Tomo el password del post hecho mediante form
+
+        ## Traigo el documento de firestore que coincide con el usuario que se registró
+        user_doc = get_user(username) # Si no existe el user nos va a devolver un document snapshot con información vacia
+
+        if user_doc.to_dict() is not None: # Valido si hay información en lo que me devolvió firebase
+            password_from_db = user_doc.to_dict()['password']
+
+            ### Valido que el password del form sea el mismo que el password de la database: 
+            if password == password_from_db:
+                ### Armo user_data y user_model para enviarlo a flask-login:
+                user_data = UserData(
+                    username= username,
+                    password= password
+                )
+                user = UserModel(
+                    user_data
+                )
+                # Uso la función de login_user de flask-login para loguear mi user:
+                login_user(user) # Login completado
+                # Flasheamos un mensaje de bienvenida para el usuario logueado: 
+                flash('Bienvenido de nuevo')
+                # Debemos redirigir ahora hacia el index de mi web app ("/")
+                redirect(url_for('index'))
+            else:
+                flash('La información no coincide con nuestra base de datos')
+        else:
+            flash('El usuario ingresado no existe')
+            
+        return redirect(url_for('index'))
+
+    return render_template('login.html', **context)
+```
+
+2. Debo cambiar la info que recibo de este login en mi "index" que como sabemos solo redirije a "/hello" por lo que vamos a editar este ultimo route: 
+
+```py
+@app.route("/hello", methods=['GET'])
+@login_required
+def hello():
+    user_ip = session.get("user_ip")
+    username = current_user.id
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': get_todos(username), 
+    }
+
+    return render_template('hello.html', **context)
+```
+
+Ahora sí. Solo nos permitirá ingresar al index/hello en caso de que ingrese las credenciales de un usario registrado en mi base de datos no relacional de firebase.
+
+**Logout**
+
+1. Creamos una nueva función en views.py dentro del module de "auth" que se va a llamar logout()
+
+```py
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Regresa pronto')
+    
+    return redirect(url_for('auth.login'))
+```
+
+2. Creamos en la navbar un botón de logout que solamente se vea si el usuario está logueado así: 
+
+```html
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">My First Web App</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('hello') }}">
+                            Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/mariano-gobea-alcoba/">
+                            <img src="{{ url_for('static', filename='images/my_logo.png') }}" alt="Logo Personal" />
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/Mgobeaalcoba" target="_blank">
+                            @Mgobeaalcoba
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}" target="_blank">
+                                Logout
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+```
+
+Listo! Ya tenemos Login y Logout en nuestra webapp. Ahora vamos a diseñar en una nueva route el Signup de nuestra web app...
+
+----------------------------------------------
+
+## Signup
+
+
+
 
 
 
