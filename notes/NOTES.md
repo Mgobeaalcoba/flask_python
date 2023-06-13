@@ -1186,11 +1186,318 @@ def hello():
 ```
 Ahí me estoy trayendo los usuarios pero puedo traer tambien los todos de mis usuarios directamente desde mi database para dejar de hardcodearlos...
 
-1. Implemento un nuevo servicio/conexion en firestore_service.py para traer los "todos": 
+1. Implemento un nuevo servicio/conexion llamado get_todos(user_id) en firestore_service.py para traer los "todos": 
 
 ```py
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
+# Defino mi project_id para poder encender el server:
+project_id = 'mgobea-flask'
+
+# Hacemos una credencial default quees por ello que antes hicimos un login default:
+credential = credentials.ApplicationDefault()
+# Inicializo firebase con mis credenciales: 
+firebase_admin.initialize_app(credential, {
+    'projectId': project_id
+})
+
+# Creo una nueva instancia de un servicio o cliente de Firestore:
+db = firestore.client()
+
+# Pruebo que mi conexión esté resultando con una función para obtener todos mis usuarios: 
+def get_users(): 
+    return db.collection('users').get()
+
+# Armo mi segunda función para esta vez traer mis todos de mi database Firebase: 
+def get_todos(user_id):
+    return db.collection('users').document(user_id).collection('todos').get()
 ```
+
+2. Recibo los todos dentro de mi context: 
+
+```py
+@app.route("/hello", methods=['GET'])
+def hello():
+    user_ip = session.get("user_ip")
+    username = session.get('username')
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': get_todos(username),
+    }
+
+    users = get_users() 
+
+    for user in users:
+        print(user.id)
+        print(user.to_dict()['password']) 
+
+    return render_template('hello.html', **context)
+```
+
+3. En mi macro, donde renderizo mis todos, transformo los mismos a dict y le pido que actue solo sobre la key "description" para así evitar que me renderize la ubicación en memoria del objeto en lugar de mi descripción: 
+
+```html
+<!-- Macro que va a renderiar el contenido de mi lista -->
+{% macro render_todo(todo) %}
+    <li>Descripción: {{todo.to_dict().description}}</li> 
+{% endmacro %}
+```
+
+Listo! Ya veo en mi web app las tareas de mi user "mariano". Traidas desde mi database noSQL (firebase). Luego debemos registrar los usuarios y las tareas en firebase directamente con el post de la app y no como lo hicimos nosotros desde Google Cloud. Pero esto viene despues... 
+
+---------------------------------------
+
+## Autenticación de usuarios: Login
+
+**Flask Login**
+
+Librería de Flask que nos permite buscar un usuario, identificar si existe, luego validar la contraseña y en caso de que todo este bien darle acceso al servicio. 
+
+1. Borro el mostrar los usuarios por consola de mi path operation "/hello" dado que no lo voy a usar así...quedaría la path operation así: 
+
+```py
+@app.route("/hello", methods=['GET'])
+def hello():
+    user_ip = session.get("user_ip")
+    username = session.get('username')
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': get_todos(username),
+    }
+
+    users = get_users() 
+
+    return render_template('hello.html', **context)
+```
+
+2. Instalamos la libreía flask-login en nuestro venv: 
+
+```bash
+pip install flask-login
+```
+
+3. Importamos la librería en nuestro archivo de __init__.py del module "app", inicializamos un objeto login_manager y le indicamos la ruta a gerenciar así como que app debe gerenciar
+
+```py
+# Importaciones de Flask y sus librerías: 
+from flask import Flask
+from flask_bootstrap import Bootstrap5
+from flask_login import LoginManager
+
+# Importo mi Config para luego configurar con ella mi app: 
+from .config import Config
+# Importo mi blueprint para poder registrarlo luego en app:
+from .auth import auth
+
+# Instanceo un obejto LoginManager
+login_manager = LoginManager()
+# Le explicito a mi objeto sobre que route va a a trabajar: 
+login_manager.login_view = 'auth.login'
+
+def create_app():
+    app = Flask(__name__)
+    bootstrap = Bootstrap5(app)
+
+    # Configuro mi aplicación desde un objeto Config.
+    app.config.from_object(Config)
+
+    # Le indico a mi objeto login_manager que inicialice la app: 
+    login_manager.init_app(app)
+
+    # Registro el blueprint creado para "auth" dentro de mi app. Sino fallará el test donde veo que exista. 
+    app.register_blueprint(auth)
+
+    return app
+```
+
+4. Hecho esto, vamos a ponerle un decorador propio de LoginManager a la route que queremos que gerencie
+
+Primero lo importamos al decorador así:
+
+```py
+from flask_login import login_required
+```
+
+Luego lo usamos así: 
+
+```py
+@app.route("/hello", methods=['GET'])
+@login_required
+def hello():
+    user_ip = session.get("user_ip")
+    username = session.get('username')
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': get_todos(username),
+    }
+
+    users = get_users() 
+
+    return render_template('hello.html', **context)
+```
+
+5. Para evitar en la nueva versión de flask-login el error "Missing user_loader or request_loader error" se debe importar en nuestro "firestore_service.py" el objeto instanciado de nuestro LoginManager para usarlo como decorador arriba de la def get_users() así: 
+
+```py
+from . import login_manager
+
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Defino mi project_id para poder encender el server:
+project_id = 'mgobea-flask'
+
+# Hacemos una credencial default quees por ello que antes hicimos un login default:
+credential = credentials.ApplicationDefault()
+# Inicializo firebase con mis credenciales: 
+firebase_admin.initialize_app(credential, {
+    'projectId': project_id
+})
+
+# Creo una nueva instancia de un servicio o cliente de Firestore:
+db = firestore.client()
+
+# Pruebo que mi conexión esté resultando con una función para obtener todos mis usuarios: 
+@login_manager.user_loader # Decorador que traigo de mi objeto login_manager para evitar error "Missing user_loader or request_loader"
+def get_users(): 
+    return db.collection('users').get()
+
+# Armo mi segunda función para esta vez traer mis todos de mi database Firebase: 
+def get_todos(user_id):
+    return db.collection('users').document(user_id).collection('todos').get()
+```
+
+Esto ya evitara que podamos acceder a "/hello" (alli pusimos el decorador) sin antes haber realizado un logín en la ruta que el login_manager está gerenciando( Así lo declaramos en el atributo login_view luego de instanciar nuestro login manager). De hecho hasta imprimirá un mensaje en el template que indica que "Please log in to access this page"
+
+6. Implementamos nuestro user_model. El mismo lo vamos a hacer en un nuevo archivo dentro de nuestro module "app" al cual llamaremos "models.py"
+
+```py
+from .firestore_service import get_user
+
+from flask_login import UserMixin
+
+class UserData():
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+class UserModel(UserMixin): 
+    def __init__(self, user_data: UserData):
+        """
+        :param user_data: UserData
+        """
+        self.id = user_data.username
+        self.password = user_data.password
+
+    @staticmethod # Indica que es un metodo estatico. Es decir, no recibe self. 
+    def query(user_id):
+        user_doc = get_user(user_id)
+        user_data = UserData(
+            username = user_doc.id,
+            password = user_doc.to_dict()['password']
+        )
+
+        return UserModel(user_data)
+```
+
+7. Implemento el metodo get_user(user_id) en mi firestore y dejo de usar el decorador de mi login_manager acá para pasar a usarlo en mi __init__.py
+
+```py
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Defino mi project_id para poder encender el server:
+project_id = 'mgobea-flask'
+
+# Hacemos una credencial default quees por ello que antes hicimos un login default:
+credential = credentials.ApplicationDefault()
+# Inicializo firebase con mis credenciales: 
+firebase_admin.initialize_app(credential, {
+    'projectId': project_id
+})
+
+# Creo una nueva instancia de un servicio o cliente de Firestore:
+db = firestore.client()
+
+# Pruebo que mi conexión esté resultando con una función para obtener todos mis usuarios: 
+# @login_manager.user_loader # Decorador que traigo de mi objeto login_manager para evitar error "Missing user_loader or request_loader"
+def get_users(): 
+    return db.collection('users').get()
+
+# Metodo que nos regresará un usuario especifico: 
+def get_user(user_id):
+    return db.collection('users').document(user_id).get()
+
+# Armo mi segunda función para esta vez traer mis todos de mi database Firebase: 
+def get_todos(user_id):
+    return db.collection('users').document(user_id).collection('todos').get()
+```
+8. Implemento en __init__.py de app la func load_user():
+
+```py
+# Importaciones de Flask y sus librerías: 
+from flask import Flask
+from flask_bootstrap import Bootstrap5
+from flask_login import LoginManager
+
+# Importo mi Config para luego configurar con ella mi app: 
+from .config import Config
+# Importo mi blueprint para poder registrarlo luego en app:
+from .auth import auth
+# Importo mi UserModel
+from .models import UserModel
+
+# Instanceo un obejto LoginManager
+login_manager = LoginManager()
+# Le explicito a mi objeto sobre que route va a a trabajar: 
+login_manager.login_view = 'auth.login'
+
+# Implementamos la función load_user que va a implementar el metodo estatico query
+# para traerse desde la base de datos a nuestro User: 
+@login_manager.user_loader
+def load_user(username):
+    return UserModel.query(username)
+
+def create_app():
+    app = Flask(__name__)
+    bootstrap = Bootstrap5(app)
+
+    # Configuro mi aplicación desde un objeto Config.
+    app.config.from_object(Config)
+
+    # Le indico a mi objeto login_manager que inicialice la app: 
+    login_manager.init_app(app)
+
+    # Registro el blueprint creado para "auth" dentro de mi app. Sino fallará el test donde veo que exista. 
+    app.register_blueprint(auth)
+
+    return app
+```
+
+Ahora debemos verificar que el usuario que está ingresando esté en nuestra base de datos y caso afirmativo darle acceso...
+
+------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 
 
 

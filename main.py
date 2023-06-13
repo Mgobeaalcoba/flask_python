@@ -1,6 +1,7 @@
-from flask import request, make_response, redirect, render_template, session, url_for, flash
-
 import unittest
+
+from flask import request, make_response, redirect, render_template, session, url_for, flash
+from flask_login import login_required
 
 from app import create_app
 from app.firestore_service import get_users, get_todos
@@ -34,6 +35,7 @@ def index():
     return response # Retornamos una respuesta de flask que en este caso es un redirect
 
 @app.route("/hello", methods=['GET'])
+@login_required
 def hello():
     # user_ip = request.cookies.get("user_ip") # Tomo el dato de IP ya no desde remote_addr sino desde la cookie que guarde en la def de arriba
     user_ip = session.get("user_ip")
@@ -65,9 +67,9 @@ def hello():
 
     users = get_users() # Nos devuelve una lista de usuarios sobre la cual vamos a poder iterar
 
-    for user in users:
-        print(user.id)
-        print(user.to_dict()['password']) # El print en este caso será por consola. No en el template.
+    # for user in users:
+    #     print(user.id)
+    #     print(user.to_dict()['password']) # El print en este caso será por consola. No en el template.
 
     
     # # Este return es para si nos hacen un "GET":
