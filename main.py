@@ -3,6 +3,7 @@ from flask import request, make_response, redirect, render_template, session, ur
 import unittest
 
 from app import create_app
+from app.firestore_service import get_users, get_todos
 
 # Inicializo una instancia de Flask
 app = create_app() # Le paso como nombre el nombre de este archivo.
@@ -13,7 +14,7 @@ def test():
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner().run(tests)
 
-todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
+# todos = ["Comprar Cafe", "Llevar a los chicos al cole", "Estudiar en Platzi", "Entregar proyecto en Mercado Libre"] # Paso "todos" también al template
 
 @app.errorhandler(404)
 def not_found(error):
@@ -42,7 +43,7 @@ def hello():
     context = {
         'user_ip': user_ip,
         'username': username,
-        'todos': todos, # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+        'todos': get_todos(username), # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
         # 'login_form': login_form,
     }
 
@@ -56,6 +57,13 @@ def hello():
 
     #     # Redirijo a index en caso de que completen el form:
     #     return redirect(url_for('index'))
+
+    users = get_users() # Nos devuelve una lista de usuarios sobre la cual vamos a poder iterar
+
+    for user in users:
+        print(user.id)
+        print(user.to_dict()['password']) # El print en este caso será por consola. No en el template.
+
     
     # # Este return es para si nos hacen un "GET":
     return render_template('hello.html', **context) # Hello World Flask. tu IP es 127.0.0.1.

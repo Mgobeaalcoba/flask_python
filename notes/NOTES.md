@@ -1101,6 +1101,90 @@ Ambos van a tener su propio ID:
 
 Con ellos luego podemos recontruir que tareas son de cada usuario
 
+------------------------------------------
+
+## Firebase en Google Cloud Platform 
+
+Para poder usar el CLI de gcloud (Google Cloud SDK) primero debes instalar su paquete instalador desde la pagina de Google Cloud. Luego una vez instalado autenticarte corriendo el comando: 
+
+```bash
+gcloud auth login
+```
+Aunque también funciona con: 
+
+```bash
+gcloud init
+```
+
+Luego debemos armar nuestra colección de usuarios declarando el primer documento o "caso" de usuario y dentro de este primer caso declarar una nueva coleccion en este caso de "todos" para también generar un primer documento o caso. 
+
+Posteriormente para administrar estos documentos desde la consola debemos correr el comando: 
+
+```bash
+gcloud auth application-default login
+```
+Con este comando vamos a poder comunicarnos desde nuestro servidor local con la base de datos noSQL de Firebase.
+
+-------------------------------------------------
+
+## Implementación de Firestore:
+
+1. Crear dentro del module "app" firestore_service.py
+2. Importamos en nuestro venv "firebase-admin"
+3. Armamos la config de firestore_service.py así:
+
+```py
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Defino mi project_id para poder encender el server:
+project_id = 'mgobea-flask'
+
+# Hacemos una credencial default quees por ello que antes hicimos un login default:
+credential = credentials.ApplicationDefault()
+# Inicializo firebase con mis credenciales: 
+firebase_admin.initialize_app(credential, {
+    'projectId': project_id
+})
+
+# Creo una nueva instancia de un servicio o cliente de Firestore:
+db = firestore.client()
+
+# Pruebo que mi conexión esté resultando con una función para obtener todos mis usuarios: 
+def get_users(): 
+    return db.collection('users').get()
+```
+
+4. Importo y ejecuto la inicialización de database para obtener los users en main.py
+
+```py
+@app.route("/hello", methods=['GET'])
+def hello():
+    user_ip = session.get("user_ip")
+    username = session.get('username')
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': todos, 
+    }
+
+    users = get_users() # Nos devuelve una lista de usuarios sobre la cual vamos a poder iterar
+
+    for user in users:
+        print(user.id)
+        print(user.to_dict()['password']) # El print en este caso será por consola. No en el template.
+    
+    return render_template('hello.html', **context)
+```
+Ahí me estoy trayendo los usuarios pero puedo traer tambien los todos de mis usuarios directamente desde mi database para dejar de hardcodearlos...
+
+1. Implemento un nuevo servicio/conexion en firestore_service.py para traer los "todos": 
+
+```py
+
+```
 
 
 

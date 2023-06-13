@@ -1,7 +1,7 @@
 <!-- Herencia de templates -->
 {% extends 'base.html' %}
 <!-- Import de macros para un render mas efectivo -->
-{% import 'macros.html' as macros %}
+<!-- {% import 'macros.html' as macros %} -->
 <!-- Import de bootstrap a wtf para renderiar el form mas facil -->
 <!-- {% from 'bootstrap4/form.html' import render_form %} -->
 
@@ -23,11 +23,11 @@
     {% endif %}
 
     <!-- Ciclo for en template HTML -->
-    <ul>
-        {% for todo in todos %}
-            {{ macros.render_todo(todo) }}
+    <ul> 
+        {% for todo in todos %} 
+            {{ macros.render_todo(todo.to_dict) }} 
         {% endfor %}    
-    </ul>
+    </ul> 
 {% endblock content %}
 
 
