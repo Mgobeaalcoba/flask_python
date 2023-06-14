@@ -3,8 +3,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 
 # Defino mi project_id para poder encender el server:
-project_id = 'mgobea-flask'
-# project_id = 'mgobea-flask-production'
+# project_id = 'mgobea-flask'
+project_id = 'mgobea-flask-production'
 
 # Hacemos una credencial default quees por ello que antes hicimos un login default:
 credential = credentials.ApplicationDefault()
