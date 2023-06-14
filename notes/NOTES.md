@@ -2045,6 +2045,45 @@ Listo, tenemos botón que va a actualizar el status de nuestra tarea de To do a 
 
 ## Deploy a producción con App Engine
 
+**App Engine** es una plataforma de **Google Cloud Platform** que va a vivir en nuestro proyecto al igual que **Firebase**. 
+
+Deployar en App Engine nos sirve para manejar en la misma consola tanto nuestra base de datos (firebase) como nuestro servidor (app engine)
+
+App Engine soporta Python, Go, Java, y algunos otros lenguajes y nos permite deployar nuestra web app en la web de forma muy simple.
+
+1. Creo en la raiz de mi proyecto un archivo que se llama app.yaml
+
+```yaml
+runtime: python37
+```
+
+2. Creo un nuevo proyecto donde voy a guardar mi proyecto en versión productiva en gcloud. Al mismo lo voy a llamar mgobea-flask-production
+
+3. Cambio el proyecto en el que estoy ubicado en gcloud desde mi consola así: 
+
+```bash
+gcloud config set project mgobea-flask-production
+```
+
+Para ver en que proyecto estamos y entender si es el correcto o no podemos usar el siguiente comando: 
+
+```bash
+gcloud config list
+```
+
+4. Corro el comando para hacer deploy de nuestra pagina: 
+
+```bash
+gcloud app deploy app.yaml
+```
+
+Si falla es porque debemos tener encendida la API de gcloud del siguiente link antes: 
+
+https://console.developers.google.com/apis/api/cloudbuild.googleapis.com/overview?project=mgobea-flask-production
+
+
+
+
 
 
 

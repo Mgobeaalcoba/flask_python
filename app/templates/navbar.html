@@ -1,7 +1,7 @@
 {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">My First Web App</a>
+            <a class="navbar-brand" href="#">My First Flask Web App</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -14,6 +14,20 @@
                             Inicio
                         </a>
                     </li>
+                    {% if not current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.signup') }}" target="_blank">
+                                Signup
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}" target="_blank">
+                                Logout
+                            </a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="https://www.linkedin.com/in/mariano-gobea-alcoba/">
                             <img src="{{ url_for('static', filename='images/my_logo.png') }}" alt="Logo Personal" />
@@ -24,13 +38,7 @@
                             @Mgobeaalcoba
                         </a>
                     </li>
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}" target="_blank">
-                                Logout
-                            </a>
-                        </li>
-                    {% endif %}
+
                 </ul>
             </div>
         </div>

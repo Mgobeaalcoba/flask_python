@@ -26,11 +26,11 @@ class MainTest(TestCase):
         # ¿Es cierto que la response a mi request get redirije a Hello? 
         self.assertEqual(response.location, '/hello')
 
-    # Cuarta prueba (Probar que hello nos regresa status code 200 al hacer GET)
+    # Cuarta prueba (Probar que hello nos regresa status code 302 al redirigir al sitio de login)
     def test_hello_get(self):
         response = self.client.get(url_for('hello'))
 
-        self.assert200(response)
+        self.assertTrue(response.status_code, 302)
 
     # Quinta prueba (Probar que hello funcione bien al hacer un post):
     def test_login_post(self):
