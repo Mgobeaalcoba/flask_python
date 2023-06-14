@@ -12,7 +12,7 @@ li {
 
 span {
     position: absolute;
-    right: 120px;
+    right: 280px;
 }
 
 #content-base {
@@ -41,3 +41,17 @@ span {
 .welcome-info {
     padding: 8px;
 }
+
+#btn-delete {
+    position: relative;
+    background-color: white;
+    border: 0cap;
+}
+
+#btn-update {
+    position: absolute;
+    right: 120px;
+    background-color: white;
+    border: 0cap;
+}
+

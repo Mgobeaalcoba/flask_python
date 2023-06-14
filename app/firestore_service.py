@@ -50,6 +50,16 @@ def delete_todo(user_id, todo):
     # 1° forma de obtener la ref de un to do´s en firebase:
     # todo_ref = db.collection('users').document(user_id).collection('todos').document(todo)
     # 2° forma de obtener la ref (con el path completo)
-    todo_ref = db.document(f'users/{user_id}/todos/{todo}')
+    todo_ref = _get_todo_ref(user_id, todo)
     # Identificada la to do que quiero eliminar ya solo resta enviar la indicación:
     todo_ref.delete()
+
+def update_todo(user_id, todo, done):
+    todo_ref = _get_todo_ref(user_id, todo)
+    todo_ref.update({
+        'done': not done # Cambia el estado actual del todo por la inversa
+    })
+
+# Función privada para obtener la ref del todo y no repetir codigo: 
+def _get_todo_ref(user_id, todo_id):
+    return db.document(f'users/{user_id}/todos/{todo_id}')

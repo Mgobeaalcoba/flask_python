@@ -1811,7 +1811,7 @@ class TodoForm(FlaskForm):
 def hello():
     user_ip = session.get("user_ip")
     username = current_user.id
-    
+
     todo_form = TodoForm()
 
     context = {
@@ -1963,6 +1963,87 @@ Una vez enviada en el contexto tengo que recibirla en hello.html y reenviarla a 
 
 Como vemos, la acción sobre el submit del form encubierto que se ve como botón está declarada en el parametro **action=** de **render_form** en lugar de declararla en la route hello con **on_submit_form()** como haciamos antes. Es una forma alternativa a tener en cuenta.   
 
+-------------------------------------
+
+## Editar estado de las tareas (de To do a Done)
+
+1. Creamos una nueva ruta que que al recibir la tarea cambie el estatus del atributo Done de las To do
+
+```py
+@app.route("/todos/update/<todo_id>/<int:done>", methods=['GET','POST'])
+def update(todo_id, done: bool):
+    user_id = current_user.id
+    update_todo(user_id, todo_id, done)
+
+    return redirect(url_for('index'))
+```
+
+2. Creamos un nuevo servicio de firebase para hacer update: 
+
+```py
+def update_todo(user_id, todo, done):
+    todo_ref = _get_todo_ref(user_id, todo)
+    todo_ref.update({
+        'done': not done # Cambia el estado actual del todo por la inversa
+    })
+
+# Función privada para obtener la ref del todo y no repetir codigo: 
+def _get_todo_ref(user_id, todo_id):
+    return db.document(f'users/{user_id}/todos/{todo_id}')
+```
+3. Creamos una nueva forma para el boton de update: 
+
+```py
+# Class UpdateTodoForm que hereda de FlaskForm y se usará para eliminar tareas:
+class UpdateTodoForm(FlaskForm):
+    submit = SubmitField('Actualizar')
+```
+
+4. Modificamos hello.html y macros.html para recibir la nueva forma y renderearla:
+
+- hello.html
+
+```html
+    <!-- Ciclo for en template HTML para renderear mis to do´s -->
+    <!-- Voy a renderiarlas con un elemento de Bootstrap llamado list-group-item -->
+    <ul id="todos-list" class="list-group"> 
+        {% for todo in todos %} 
+            {{ macros.render_todo(todo, delete_todo_form, update_todo_form) }} 
+        {% endfor %}    
+    </ul> 
+
+```
+- macros.html
+
+```html
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
+<!-- Macro que va a renderiar el contenido de mi lista -->
+{% macro render_todo(todo, delete_todo_form, update_todo_form) %}
+    <li id="task" class="list-group-item d-flex justify-content-between align-items-center">
+        Descripción: {{todo.to_dict().description}}
+        <span class="badge bg-primary rounded-pill">
+            {% if todo.to_dict().done %}
+                Done
+            {% else %}
+                To do
+            {% endif %}
+        </span>
+        <button type="button" id= "btn-update" class="btn btn-light">
+            {{ render_form(update_todo_form, action=url_for('update', todo_id = todo.id, done = todo.to_dict().done)) }}
+        </button>
+        <button type="button" id= "btn-delete" class="btn btn-light">
+            {{ render_form(delete_todo_form, action=url_for('delete', todo_id = todo.id)) }}
+        </button>
+{% endmacro %}
+```
+
+Listo, tenemos botón que va a actualizar el status de nuestra tarea de To do a Done en caso de que queramos conservarla en el lista. A todos estos nuevos elementos les fue cambiando algunos elementos de su diseño para darle un toque especial ademas de bootstrap en main.css dentro de app/static/css
+
+------------------------------------------------
+
+## Deploy a producción con App Engine
 
 
 

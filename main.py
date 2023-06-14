@@ -4,8 +4,8 @@ from flask import request, make_response, redirect, render_template, session, ur
 from flask_login import login_required, current_user
 
 from app import create_app
-from app.firestore_service import get_users, get_todos, post_todo, delete_todo
-from app.forms import TodoForm, DeleteTodoForm 
+from app.firestore_service import get_users, get_todos, post_todo, delete_todo, update_todo
+from app.forms import TodoForm, DeleteTodoForm , UpdateTodoForm
 
 # Inicializo una instancia de Flask
 app = create_app() # Le paso como nombre el nombre de este archivo.
@@ -55,12 +55,16 @@ def hello():
     # Instanceo un DeleteTodoForm
     delete_todo_form = DeleteTodoForm()
 
+    # Instanceo un UpdateTodoForm
+    update_todo_form = UpdateTodoForm()
+
     context = {
         'user_ip': user_ip,
         'username': username,
         'todos': get_todos(username), # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
         'todo_form': todo_form,
         'delete_todo_form': delete_todo_form,
+        'update_todo_form': update_todo_form,
     }
 
     if todo_form.validate_on_submit():
@@ -97,9 +101,17 @@ def hello():
 def test_server_error():
     raise(Exception('500 error'))
 
-@app.route("/todos/delete/<todo_id>", methods=['GET', 'POST']) # Dinamic route en flask usa "< >" en lugar de "{}" como se usa en Fast Api
+@app.route("/todos/delete/<todo_id>", methods=['GET','POST']) # Dinamic route en flask usa "< >" en lugar de "{}" como se usa en Fast Api
 def delete(todo_id): # El todo_id viene desde la ruta en este caso. No desde un form
     user_id = current_user.id
     delete_todo(user_id, todo_id)
     
     return redirect(url_for('index'))
+
+@app.route("/todos/update/<todo_id>/<int:done>", methods=['GET','POST'])
+def update(todo_id, done: bool):
+    user_id = current_user.id
+    update_todo(user_id, todo_id, done)
+
+    return redirect(url_for('index'))
+    
