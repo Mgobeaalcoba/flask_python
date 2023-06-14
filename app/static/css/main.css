@@ -6,6 +6,15 @@ img {
     max-width: 30px;
 }
 
+li {
+    position: relative;
+}
+
+span {
+    position: absolute;
+    right: 120px;
+}
+
 #content-base {
     margin: 12px;
 }
@@ -20,6 +29,10 @@ img {
     font-family: sans-serif;
 }
 
+#todos-list {
+    margin-top: 32px;
+}
+
 .titles-form {
     margin-left: 76px;
     margin-top: 32px;
@@ -27,8 +40,4 @@ img {
 
 .welcome-info {
     padding: 8px;
-}
-
-.task-list {
-    padding: 4px;
 }

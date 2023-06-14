@@ -1829,6 +1829,145 @@ def hello():
 
     return render_template('hello.html', **context) 
 ```
+----------------------------
+
+## Eliminar tareas o to do´s:
+
+1. Elimino mis actuales to do´s de firebase dado que solo tiene un campo y el mismo es description pero mi nuevo modelo de to do´s tiene que tener un segundo campo llamado "done" que especifique con un boolean si la tarea esta completa o no
+
+2. En la func post_todo de firestore_service.py donde estoy incorporando nuevas tareas a mi lista debo agregar en el dict que estoy haciendo "add" un nuevo campo llamado "done" con valor False por defecto. 
+
+```py
+# Armo una función para insertar en mi database una nueva tarea: 
+def post_todo(user_id, todo):
+    todo_ref = db.collection('users').document(user_id).collection('todos')
+    todo_ref.add({
+        'description': todo,
+        'done': False,
+    })
+```
+
+3. Creo que main.py una nueva route para manejar el delete de tareas una vez están completadas: 
+
+```py
+@app.route("/todos/delete/<todo_id>", methods=['GET', 'POST']) # Dinamic route en flask usa "< >" en lugar de "{}" como se usa en Fast Api
+def delete(todo_id): # El todo_id viene desde la ruta en este caso. No desde un form
+    user_id = current_user.id
+    delete_todo(user_id, todo_id)
+    
+    return redirect(url_for('index'))
+```
+
+las rutas dinamicas en Flask se marcan con "< >" y no con "{}" como funciona en FastApi
+
+4. Implemento un nuevo metodo en nuestro firestore_service.py llamado delete_todo():
+
+```py
+# Función para eliminar tareas o to do´s de la colection de un user: 
+def delete_todo(user_id, todo):
+    # 1° forma de obtener la ref de un to do´s en firebase:
+    # todo_ref = db.collection('users').document(user_id).collection('todos').document(todo)
+    # 2° forma de obtener la ref (con el path completo)
+    todo_ref = db.document(f'users/{user_id}/todos/{todo}')
+    # Identificada la to do que quiero eliminar ya solo resta enviar la indicación:
+    todo_ref.delete()
+```
+
+5. Luego modificamos nuestro Macro que renderea los to do´s para que incluya otra forma ademas del listado de todos. Por ejemplo una "x" para eliminar la todo...Vamos a utilizar en este caso un componente de Bootstrap
+
+```html
+<!-- Macro que va a renderiar el contenido de mi lista -->
+{% macro render_todo(todo) %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        Descripción: {{todo.to_dict().description}}
+        <span class="badge bg-primary rounded-pill">
+            {% if todo.to_dict().done %}
+                Done
+            {% else %}
+                To do
+            {% endif %}
+        </span>
+    </li> 
+{% endmacro %}
+```
+A su vez debemos editar minimamente la parte del content de hello donde usamos la macro así: 
+
+```html
+    <!-- Ciclo for en template HTML para renderear mis to do´s -->
+    <!-- Voy a renderiarlas con un elemento de Bootstrap llamado list-group-item -->
+    <ul id="todos-list" class="list-group"> 
+        {% for todo in todos %} 
+            {{ macros.render_todo(todo) }} 
+        {% endfor %}    
+    </ul> 
+```
+
+6. Voy a agregar un botón que en realidad es un form con solamente un sbumit field para eliminar que al apretar accione el metodo delete_todo():
+
+```py
+# Class DeleteForm que hereda de FlaskForm y se usará para eliminar tareas:
+class DeleteTodoForm(FlaskForm):
+    submit = SubmitField('Completar')
+```
+
+Creada la forma tenemos que instanciarla en hello y pasarla dentro del contexto para luego renderearla en macro.html que está inserto en hello.html. 
+
+```py
+    # Instanceo un DeleteTodoForm
+    delete_todo_form = DeleteTodoForm()
+
+    context = {
+        'user_ip': user_ip,
+        'username': username,
+        'todos': get_todos(username), # Importante no olvidar la ultima coma en el dict para que expanda todas las variables.
+        'todo_form': todo_form,
+        'delete_todo_form': delete_todo_form,
+    }
+```
+
+Una vez enviada en el contexto tengo que recibirla en hello.html y reenviarla a la macro.html: 
+
+- hello.html
+
+```html
+    <!-- Ciclo for en template HTML para renderear mis to do´s -->
+    <!-- Voy a renderiarlas con un elemento de Bootstrap llamado list-group-item -->
+    <ul id="todos-list" class="list-group"> 
+        {% for todo in todos %} 
+            {{ macros.render_todo(todo, delete_todo_form) }} 
+        {% endfor %}    
+    </ul>
+```
+
+- macros.html
+
+```html
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
+<!-- Macro que va a renderiar el contenido de mi lista -->
+{% macro render_todo(todo, delete_todo_form) %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        Descripción: {{todo.to_dict().description}}
+        <span class="badge bg-primary rounded-pill">
+            {% if todo.to_dict().done %}
+                Done
+            {% else %}
+                To do
+            {% endif %}
+        </span>
+        {{ render_form(delete_todo_form, action=url_for('delete', todo_id=todo.id)) }}
+    </li> 
+{% endmacro %}
+```
+
+Como vemos, la acción sobre el submit del form encubierto que se ve como botón está declarada en el parametro **action=** de **render_form** en lugar de declararla en la route hello con **on_submit_form()** como haciamos antes. Es una forma alternativa a tener en cuenta.   
+
+
+
+
+
+
 
 
 

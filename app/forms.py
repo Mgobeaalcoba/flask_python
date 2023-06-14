@@ -25,3 +25,7 @@ class SignupForm(FlaskForm):
 class TodoForm(FlaskForm):
     description = StringField('Descripción', validators=[DataRequired()])
     submit = SubmitField('Crear')
+
+# Class DeleteForm que hereda de FlaskForm y se usará para eliminar tareas:
+class DeleteTodoForm(FlaskForm):
+    submit = SubmitField('Eliminar')

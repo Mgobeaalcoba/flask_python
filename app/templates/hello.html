@@ -7,14 +7,14 @@
 
 {% block title %}
     {{ super() }}
-    Bienvenido
+    Bienvenid@
 {% endblock title %}
 
 {% block content %}
     <!-- Condicionales en template HTML -->
     {% if username %}
         <!-- Con "|" puedo aplicar capitalize u otro filtro/metodo a mis variables traidas desde Python -->
-        <h1 class="welcome-info">Bienvenido {{  username | capitalize }}</h1>
+        <h1 class="welcome-info">Bienvenid@ {{  username | capitalize }}</h1>
     {% endif %}
     {% if user_ip %}
         <h3 class="welcome-info">Te estas conectando desde tu Ip :{{user_ip}} </h3>
@@ -22,18 +22,20 @@
         <a href="{{ url_for('index') }}">Ir a inicio</a>
     {% endif %}
 
-    <!-- Ciclo for en template HTML -->
-    <ul> 
-        {% for todo in todos %} 
-            {{ macros.render_todo(todo) }} 
-        {% endfor %}    
-    </ul> 
-
     <!-- Rendereo mi form para tareas debajo de las que tareas que ya tengo -->
     <h3 id="title-login" class="titles-form">Ingresa una nueva tarea:</h3>
     <div id="form-register" class="container">
         {{ render_form(todo_form) }}
     </div>
+
+    <!-- Ciclo for en template HTML para renderear mis to do´s -->
+    <!-- Voy a renderiarlas con un elemento de Bootstrap llamado list-group-item -->
+    <ul id="todos-list" class="list-group"> 
+        {% for todo in todos %} 
+            {{ macros.render_todo(todo, delete_todo_form) }} 
+        {% endfor %}    
+    </ul> 
+
 {% endblock content %}
 
 

@@ -41,5 +41,15 @@ def post_user(user_data):
 def post_todo(user_id, todo):
     todo_ref = db.collection('users').document(user_id).collection('todos')
     todo_ref.add({
-        'description': todo
+        'description': todo,
+        'done': False,
     })
+
+# Función para eliminar tareas o to do´s de la colection de un user: 
+def delete_todo(user_id, todo):
+    # 1° forma de obtener la ref de un to do´s en firebase:
+    # todo_ref = db.collection('users').document(user_id).collection('todos').document(todo)
+    # 2° forma de obtener la ref (con el path completo)
+    todo_ref = db.document(f'users/{user_id}/todos/{todo}')
+    # Identificada la to do que quiero eliminar ya solo resta enviar la indicación:
+    todo_ref.delete()

@@ -13,6 +13,7 @@
             <link rel="icon" href="{{ url_for('static', filename='images/my_logo.png') }}" />
 
             {% block styles %}
+                <!-- Cargo los formatos CSS de Bootstrap5 -->
                 {{ bootstrap.load_css() }}
                 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
             {% endblock %}
@@ -48,6 +49,7 @@
             </div>
 
             {% block scripts %}
+                <!-- Cargo la logica JavaScript de Bootstrap para los elementos -->
                 {{ bootstrap.load_js() }}
             {% endblock %}
         {% endblock %}

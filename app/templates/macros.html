@@ -1,4 +1,17 @@
+<!-- Import de bootstrap a wtf para renderiar el form mas facil -->
+{% from 'bootstrap4/form.html' import render_form %}
+
 <!-- Macro que va a renderiar el contenido de mi lista -->
-{% macro render_todo(todo) %}
-    <li class="task-list">Descripción: {{todo.to_dict().description}}</li> 
+{% macro render_todo(todo, delete_todo_form) %}
+    <li id="task" class="list-group-item d-flex justify-content-between align-items-center">
+        Descripción: {{todo.to_dict().description}}
+        <span class="badge bg-primary rounded-pill">
+            {% if todo.to_dict().done %}
+                Done
+            {% else %}
+                To do
+            {% endif %}
+        </span>
+        {{ render_form(delete_todo_form, action=url_for('delete', todo_id=todo.id)) }}
+    </li> 
 {% endmacro %}
