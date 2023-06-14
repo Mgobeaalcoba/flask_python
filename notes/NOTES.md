@@ -2081,7 +2081,17 @@ Si falla es porque debemos tener encendida la API de gcloud del siguiente link a
 
 https://console.developers.google.com/apis/api/cloudbuild.googleapis.com/overview?project=mgobea-flask-production
 
+Tips posteriores al deploy: 
 
+Deployed service [default] to [https://mgobea-flask-production.ue.r.appspot.com]
+
+You can stream logs from the command line by running:
+  $ gcloud app logs tail -s default
+
+To view your application in the web browser run:
+  $ gcloud app browse
+
+NO olvidemos encender firestore en modo nativo para que la app pueda correr una vez en linea. Dado que la encendimos en nuestro proyecto en modo development que es el que guardamos en mgobea-flask
 
 
 
