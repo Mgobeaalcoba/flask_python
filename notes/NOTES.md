@@ -20,7 +20,7 @@ Muchas de las aplicaciones web que existen son gratuitas.
 Puedes acceder a tu información en cualquier momento y lugar.
 No dependes de un dispositivo en específico ya que la aplicación se encuentra almacenada en la web.
 
-<img src="./images/apps_web.PNG">
+<img src="../images/apps_web.PNG">
 
 ## ¿Que es Flask? Microframework
 
